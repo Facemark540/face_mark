@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "690264837267",
+    "project_id": "face-mark-4c60c",
+    "storage_bucket": "face-mark-4c60c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:690264837267:android:1a82cef5fc9e3e75691166",
+        "android_client_info": {
+          "package_name": "com.example.face_mark"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZ4mmmgi7gAdAk1ZGtMQnMM3iy0mK30DA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
