@@ -1,8 +1,24 @@
+import 'package:face_mark/admin/studentdetails.dart';
+import 'package:face_mark/services/firebase_add_student.dart';
 import 'package:flutter/material.dart';
 
-class AddStudentScreen extends StatelessWidget {
+class AddStudentScreen extends StatefulWidget {
   const AddStudentScreen({super.key});
 
+  @override
+  State<AddStudentScreen> createState() => _AddStudentScreenState();
+}
+
+class _AddStudentScreenState extends State<AddStudentScreen> {
+  final TextEditingController _fullNameController = TextEditingController();
+
+  final TextEditingController _emailController = TextEditingController();
+
+  final TextEditingController _rollNumberController = TextEditingController();
+
+  final TextEditingController _departmentController = TextEditingController();
+
+  final TextEditingController _yearController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,30 +42,56 @@ class AddStudentScreen extends StatelessWidget {
         child: ListView(
           children: <Widget>[
             _buildTextField(
+              controller: _fullNameController,
               label: 'Student Name',
             ),
             const SizedBox(height: 15),
             _buildTextField(
+              controller:_rollNumberController,
               label: 'Roll Number',
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 15),
             _buildTextField(
-              label: 'Class',
+              controller: _departmentController,
+              label: 'Department',
             ),
             const SizedBox(height: 15),
             _buildTextField(
-              label: 'Section',
+              controller: _yearController,
+              label: 'Year',
             ),
             const SizedBox(height: 15),
             _buildTextField(
+              controller: _emailController,
               label: 'Email Address',
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 25),
             ElevatedButton(
-              onPressed: () {
-                // Handle form submission
+              onPressed: () async{
+                  await addStudent(
+                    fullName: _fullNameController.text,
+                    email: _emailController.text,
+                    rollNumber: _rollNumberController.text,
+                    department: _departmentController.text,
+                    year: _yearController.text,
+                    context: context
+                  );
+                  
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => StudentDetailsScreen(
+                            
+                            )),
+                  );
+                  _emailController.clear();
+                  _departmentController.clear();
+                  _fullNameController.clear();
+                  _rollNumberController.clear();
+                  _yearController.clear();
+                
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(
@@ -77,10 +119,12 @@ class AddStudentScreen extends StatelessWidget {
   }
 
   Widget _buildTextField({
+    required TextEditingController controller,
     required String label,
     TextInputType keyboardType = TextInputType.text,
   }) {
     return TextField(
+      controller: controller,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: label,

@@ -1,7 +1,25 @@
+import 'package:face_mark/admin/teacherdetails.dart';
+import 'package:face_mark/services/firebase_add_teacher.dart';
 import 'package:flutter/material.dart';
 
-class AddTeacherScreen extends StatelessWidget {
-  const AddTeacherScreen({super.key});
+class AddTeacherScreen extends StatefulWidget {
+
+  AddTeacherScreen({super.key});
+
+  @override
+  State<AddTeacherScreen> createState() => _AddTeacherScreenState();
+}
+
+class _AddTeacherScreenState extends State<AddTeacherScreen> {
+  final TextEditingController _fullNameController = TextEditingController();
+
+  final TextEditingController _emailController = TextEditingController();
+
+  final TextEditingController _phoneNumberController = TextEditingController();
+
+  final TextEditingController _subjectController = TextEditingController();
+
+  final TextEditingController _qualificationsController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -19,28 +37,44 @@ class AddTeacherScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              _buildTextField(label: 'Full Name'),
+              _buildTextField(controller: _fullNameController, label: 'Full Name'),
               const SizedBox(height: 15),
-              _buildTextField(label: 'Email'),
+              _buildTextField(controller: _emailController, label: 'Email'),
               const SizedBox(height: 15),
-              _buildTextField(label: 'Phone Number'),
+              _buildTextField(controller: _phoneNumberController, label: 'Phone Number'),
               const SizedBox(height: 15),
-              _buildTextField(label: 'Subject'),
+              _buildTextField(controller: _subjectController, label: 'Subject'),
               const SizedBox(height: 15),
-              _buildTextField(label: 'Qualifications'),
+              _buildTextField(controller: _qualificationsController, label: 'Qualifications'),
               const SizedBox(height: 25),
               ElevatedButton(
-                onPressed: () {
-                  // Implement save logic
+                onPressed: () async {
+                 await addTeacher(
+                    fullName: _fullNameController.text,
+                    email: _emailController.text,
+                    phoneNumber: _phoneNumberController.text,
+                    subject: _subjectController.text,
+                    qualifications: _qualificationsController.text,
+                    context: context
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TeacherDetailsScreen(
+                            
+                            )),
+                  );
+                  _fullNameController.clear();
+                  _emailController.clear();
+                  _phoneNumberController.clear();
+                  _subjectController.clear();
+                  _qualificationsController.clear();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      const Color.fromARGB(255, 255, 111, 0), // Orange Button
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
+                  backgroundColor: const Color.fromARGB(255, 255, 111, 0), // Orange Button
+                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(15), // Rounded button corners
+                    borderRadius: BorderRadius.circular(15), // Rounded button corners
                   ),
                 ),
                 child: const Text(
@@ -59,8 +93,9 @@ class AddTeacherScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField({required String label}) {
+  Widget _buildTextField({required TextEditingController controller, required String label}) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(

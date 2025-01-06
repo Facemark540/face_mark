@@ -1,6 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:face_mark/services/firebase_add_teacher.dart';
 import 'package:flutter/material.dart';
 
-class TeacherDetailsScreen extends StatelessWidget {
+class TeacherDetailsScreen extends StatefulWidget {
+  @override
+  _TeacherDetailsScreenState createState() => _TeacherDetailsScreenState();
+}
+
+class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,31 +27,45 @@ class TeacherDetailsScreen extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 19, 53, 126),
         elevation: 0, // Remove AppBar shadow
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue.shade100, Colors.blue.shade50],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue.shade100, Colors.blue.shade50],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: StreamBuilder<QuerySnapshot>(
+              stream: fetchTeachers(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                final teachers = snapshot.data!.docs;
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16.0),
+                  itemCount: teachers.length,
+                  itemBuilder: (context, index) {
+                    final teacher = teachers[index];
+                    return _buildDetailCard(
+                      title: teacher['fullName'],
+                      subtitle:
+                          '${teacher['subject']}',
+                      context: context,
+                      docId: teacher.id,
+                    );
+                  },
+                );
+              },
+            ),
           ),
-        ),
-        child: ListView(
-          padding: const EdgeInsets.all(16.0),
-          children: [
-            _buildDetailCard(
-              title: 'Dr. John Smith',
-              subtitle: 'Subject: Mathematics\nID: T01',
-              context: context,
+          if (_isLoading)
+            Center(
+              child: CircularProgressIndicator(),
             ),
-            const SizedBox(height: 15),
-            _buildDetailCard(
-              title: 'Ms. Jane Doe',
-              subtitle: 'Subject: English\nID: T02',
-              context: context,
-            ),
-            // Add more teacher details here...
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -51,6 +74,7 @@ class TeacherDetailsScreen extends StatelessWidget {
     required String title,
     required String subtitle,
     required BuildContext context,
+    required String docId,
   }) {
     return Card(
       elevation: 5,
@@ -76,8 +100,8 @@ class TeacherDetailsScreen extends StatelessWidget {
           subtitle: Text(
             subtitle,
             style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
+              fontSize: 18,
+              color: Colors.grey[800],
             ),
           ),
           trailing: Row(
@@ -85,7 +109,7 @@ class TeacherDetailsScreen extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () {
-                  print('Edit button tapped');
+                  _showEditDialog(context, docId, title, subtitle);
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -98,7 +122,7 @@ class TeacherDetailsScreen extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  print('Delete button tapped');
+                  deleteTeacher(docId);
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -113,6 +137,58 @@ class TeacherDetailsScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showEditDialog(
+      BuildContext context, String docId, String currentName, String currentSubject) {
+    final _nameController = TextEditingController(text: currentName);
+    final _subjectController = TextEditingController(text: currentSubject);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Edit Teacher'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(labelText: 'Full Name'),
+              ),
+              TextField(
+                controller: _subjectController,
+                 decoration: InputDecoration(labelText: 'Subject'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                setState(() {
+                  _isLoading = true;
+                });
+                await updateTeacher(docId, _nameController.text, _subjectController.text);
+                setState(() {
+                  _isLoading = false;
+                });
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Data saved successfully')),
+                );
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
