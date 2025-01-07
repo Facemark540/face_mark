@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
-      home: AdminHomeScreen(),
+      home: TeacherHomeScreen(),
     );
   }
 }

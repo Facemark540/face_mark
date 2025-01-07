@@ -1,6 +1,6 @@
 import 'package:face_mark/teacher/editattendance.dart';
 import 'package:face_mark/teacher/uploadImageScreen.dart';
-import 'package:face_mark/teacher/viewattendance.dart';
+import 'package:face_mark/teacher/viewstudent.dart';
 import 'package:flutter/material.dart';
 
 class TeacherHomeScreen extends StatefulWidget {
