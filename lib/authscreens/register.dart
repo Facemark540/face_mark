@@ -1,3 +1,6 @@
+import 'package:face_mark/authscreens/login.dart';
+import 'package:face_mark/services/firebase_auth_services.dart';
+
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -8,7 +11,37 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController roleController = TextEditingController();
   bool isVisible = false;
+
+  void _register() async {
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+    String fullName = fullNameController.text.trim();
+    String role = roleController.text.trim().toLowerCase(); // Normalize the role
+
+    // Call the signup function
+    String? result = await signupUser(email, password, fullName, role);
+
+    if (result == null) {
+      // Registration successful
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registration Successful')),
+      );
+
+      // Navigate to the login screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    } else {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result)));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +54,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-
-              // Header
               const Text(
                 'Register',
                 style: TextStyle(
@@ -33,28 +64,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-
-              // Full Name Input
-              _buildTextField('Full Name', 'Enter the name'),
-
+              _buildTextField('Full Name', 'Enter your full name', fullNameController),
               const SizedBox(height: 20),
-
-              // Username Input
-              _buildTextField('USER NAME', 'Enter The User Name'),
-
+              _buildTextField('Email', 'Enter your email', emailController),
               const SizedBox(height: 20),
-
-              // Password Input
               _buildPasswordField(),
-
               const SizedBox(height: 20),
-
-              // Role Input
-              _buildTextField('ROLE', 'Enter The Role'),
-
+              _buildTextField('Role', 'Enter your role (admin, teacher, student)', roleController),
               const SizedBox(height: 30),
-
-              // Sign Up Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -62,19 +79,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     backgroundColor: Colors.orange.shade700,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                   ),
-                  onPressed: () {
-                    // Handle sign-up logic here
-                  },
+                  onPressed: _register,
                   child: const Text(
                     'Sign Up',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
-                      fontFamily: 'Roboto',
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Already have an account? ',
+                      style: TextStyle(fontFamily: 'Roboto', color: Colors.grey)),
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to the Login screen
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      );
+                    },
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -83,7 +122,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // Password Field
   Widget _buildPasswordField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,7 +135,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
         TextField(
-          obscureText: isVisible,
+          controller: passwordController,
+          obscureText: !isVisible,
           decoration: InputDecoration(
             hintText: "**********",
             hintStyle: const TextStyle(color: Colors.grey),
@@ -120,8 +159,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // TextField Builder
-  Widget _buildTextField(String label, String hint) {
+  Widget _buildTextField(String label, String hint, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -134,6 +172,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
         TextField(
+          controller: controller,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.grey),

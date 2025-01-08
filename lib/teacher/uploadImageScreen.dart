@@ -38,7 +38,6 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Apply gradient background from blue to white
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -46,9 +45,8 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.indigo[900]!, // Start with dark blue at the top
-              Colors.indigo[800]!,
-              const Color.fromARGB(255, 186, 202, 249), // End with white at the bottom
+              Colors.lightBlue[100]!,
+              Colors.lightBlue[50]!,
             ],
           ),
         ),
@@ -64,19 +62,37 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
                     )
                   : Image.file(_image!),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _pickImage,
-                child: const Text('Pick Image from Gallery'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  textStyle: const TextStyle(fontSize: 18),
+              GestureDetector(
+                onTap: _pickImage,
+                child: Container(
+                  width: 350,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.blue),
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.blue[50],
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.upload, size: 50, color: Colors.blue[800]),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Choose Image',
+                          style: TextStyle(fontSize: 16, color: Colors.blue[800]),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _uploadImage,
-                child: const Text('Upload Image'),
+                child:  Text('Upload Image',style: TextStyle(color: Colors.white),),
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[800],
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   textStyle: const TextStyle(fontSize: 18),
                 ),

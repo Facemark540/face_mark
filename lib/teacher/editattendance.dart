@@ -1,204 +1,160 @@
-import 'package:face_mark/teacher/editHourlyAttendenceScreen.dart';
+import 'package:face_mark/services/firebase_attendence.dart';
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-class EditAttendanceScreen extends StatefulWidget {
-  const EditAttendanceScreen({super.key});
+class AttendanceCalendar extends StatefulWidget {
+  final String studentId;
+  final String studentName;
+
+  const AttendanceCalendar({
+    required this.studentId,
+    required this.studentName,
+    Key? key,
+  }) : super(key: key);
 
   @override
-  State<EditAttendanceScreen> createState() => _EditAttendanceScreenState();
+  State<AttendanceCalendar> createState() => _AttendanceCalendarState();
 }
 
-class _EditAttendanceScreenState extends State<EditAttendanceScreen> {
-  List<int> attendedDays = [2, 5, 8, 12, 15, 18, 21, 25, 28];
+class _AttendanceCalendarState extends State<AttendanceCalendar> {
+  DateTime _focusedDay = DateTime.now();
+  Map<String, bool> _attendance = {}; // Stores attendance for each date
 
   @override
-  Widget build(BuildContext context) {
-    // Get the current month and year
-    DateTime now = DateTime.now();
-    int year = now.year;
-    int month = now.month;
+  void initState() {
+    super.initState();
+    _fetchAttendance(); // Fetch attendance when the screen initializes
+  }
 
-    // Calculate the number of days in the current month
-    int daysInMonth = DateTime(year, month + 1, 0).day;
-
-    // Function to get the month name
-    String getMonth(int monthNo) {
-      switch (monthNo) {
-        case 1:
-          return 'January';
-        case 2:
-          return 'February';
-        case 3:
-          return 'March';
-        case 4:
-          return 'April';
-        case 5:
-          return 'May';
-        case 6:
-          return 'June';
-        case 7:
-          return 'July';
-        case 8:
-          return 'August';
-        case 9:
-          return 'September';
-        case 10:
-          return 'October';
-        case 11:
-          return 'November';
-        case 12:
-          return 'December';
-        default:
-          return 'January';
+  /// Toggles attendance (present/absent) for a specific day.
+  void _toggleAttendance(DateTime day) {
+    String dateKey = "${day.year}-${day.month}-${day.day}";
+    setState(() {
+      // Toggle attendance status or mark as present if not recorded
+      if (_attendance.containsKey(dateKey)) {
+        _attendance[dateKey] = !_attendance[dateKey]!;
+      } else {
+        _attendance[dateKey] = true; // Default to present
       }
+    });
+  }
+
+  /// Fetches attendance from Firebase and updates the UI.
+  Future<void> _fetchAttendance() async {
+    try {
+      var data = await fetchAttendance(widget.studentId);
+      if (data != null && data['attendance'] != null) {
+        setState(() {
+          _attendance = Map<String, bool>.from(data['attendance']);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error fetching attendance: $e")),
+      );
     }
+  }
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start, // Align elements to the start
-          children: [
-            // Title Section
-            Text(
-              'Attendance Calendar',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
+  /// Saves the current attendance data to Firebase.
+  Future<void> _saveAttendance() async {
+    try {
+      await saveAttendance(
+        studentId: widget.studentId,
+        studentName: widget.studentName,
+        attendance: _attendance,
+        month: _focusedDay.month.toString(),
+        year: _focusedDay.year.toString(),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Attendance saved successfully!")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error saving attendance: $e")),
+      );
+    }
+  }
 
-            // Calendar Section
-            Text(
-              '${getMonth(now.month)} / $year',
-              style: const TextStyle(color: Colors.black, fontSize: 22),
-            ),
-            const SizedBox(height: 20),
-
-            // GridView for the Calendar (Days of the Week)
-            GridView.builder(
-              shrinkWrap: true, // Prevents GridView from taking up excess space
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 7, // 7 columns (days of the week)
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
-                childAspectRatio: 1.0,
-              ),
-              itemCount:
-                  daysInMonth + 7, // Days of the month + space for titles
-              itemBuilder: (context, index) {
-                if (index < 7) {
-                  // Display the titles of the days (Sunday, Monday, etc.)
-                  return Center(
-                    child: Text(
-                      getDayName(index),
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    ),
-                  );
-                } else {
-                  // Calculate the day number (1-based index for the day of the month)
-                  int dayOfMonth = index - 7 + 1;
-
-                  // Check if the day is attended
-                  bool isAttended = attendedDays.contains(dayOfMonth);
-
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => EditHourlyAttendence(
-                                    day: getDayName(index),
-                                    month: getMonth(now.month),
-                                    year: now.year,
-                                  )));
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: isAttended ? Colors.green : Colors.red,
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(
-                          color: Colors
-                              .grey, // Adding a subtle border for a clean design
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        '$dayOfMonth',
-                        style: TextStyle(
-                          color: isAttended ? Colors.white : Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
-
-            // SizedBox for spacing between GridView and button
-            const SizedBox(height: 16),
-
-            // Align the button to the right and apply styling
-            Align(
-              alignment: Alignment.centerRight, // Align button to the right
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle the save action here
-                  print("Attendance saved!");
-                },
-                child: const Text(
-                  'Save',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.blue, // Set the background color to blue
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(12), // Set border radius
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12), // Optional padding for better button size
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+  /// Returns the color decoration for a given day based on attendance status.
+  BoxDecoration _getDayDecoration(DateTime day) {
+    String dateKey = "${day.year}-${day.month}-${day.day}";
+    if (_attendance.containsKey(dateKey)) {
+      // Mark attendance as green (present) or red (absent)
+      return BoxDecoration(
+        color: _attendance[dateKey]! ? Colors.green : Colors.red,
+        shape: BoxShape.circle,
+      );
+    }
+    // Neutral decoration for days with no attendance record
+    return const BoxDecoration(
+      color: Colors.grey,
+      shape: BoxShape.circle,
     );
   }
 
-  // Function to get day name based on index (0: Sunday, 1: Monday, etc.)
-  String getDayName(int index) {
-    switch (index) {
-      case 0:
-        return 'Sun';
-      case 1:
-        return 'Mon';
-      case 2:
-        return 'Tue';
-      case 3:
-        return 'Wed';
-      case 4:
-        return 'Thu';
-      case 5:
-        return 'Fri';
-      case 6:
-        return 'Sat';
-      default:
-        return '';
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Attendance: ${widget.studentName}'),
+      ),
+      body: Column(
+        children: [
+          // Calendar to display attendance
+          TableCalendar(
+            focusedDay: _focusedDay,
+            firstDay: DateTime(2000),
+            lastDay: DateTime(2100),
+            calendarStyle: CalendarStyle(
+              todayDecoration: const BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.circle,
+              ),
+              outsideDaysVisible: true, // Show all days, even outside current month
+            ),
+            calendarBuilders: CalendarBuilders(
+              // Custom decoration for each day
+              defaultBuilder: (context, day, focusedDay) {
+                return Container(
+                  decoration: _getDayDecoration(day),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${day.day}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                );
+              },
+              todayBuilder: (context, day, focusedDay) {
+                return Container(
+                  decoration: _getDayDecoration(day),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${day.day}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              },
+            ),
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _focusedDay = focusedDay;
+                _toggleAttendance(selectedDay);
+              });
+            },
+          ),
+          // Save Button
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: _saveAttendance,
+              child: const Text("Save Attendance"),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
