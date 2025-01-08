@@ -142,6 +142,8 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
   void _showEditDialog(BuildContext context, String docId, String currentName, String currentDepartment) {
     final _nameController = TextEditingController(text: currentName);
     final _departmentController = TextEditingController(text: currentDepartment);
+    final _rollNumberController = TextEditingController(text: '');
+    final _yearController = TextEditingController(text: '');
 
     showDialog(
       context: context,
@@ -159,6 +161,14 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
                 controller: _departmentController,
                 decoration: InputDecoration(labelText: 'Department'),
               ),
+              TextField(
+                controller: _rollNumberController,
+                decoration: InputDecoration(labelText: 'Roll Number'),
+              ),
+              TextField(
+                controller: _yearController,
+                decoration: InputDecoration(labelText: 'Year'),
+              ),
             ],
           ),
           actions: [
@@ -173,7 +183,7 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
                 setState(() {
                   _isLoading = true;
                 });
-                await updateStudent(docId, _nameController.text, _departmentController.text);
+                await updateStudent(docId, _nameController.text, _departmentController.text, _rollNumberController.text, _yearController.text);
                 setState(() {
                   _isLoading = false;
                 });
@@ -189,7 +199,4 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
       },
     );
   }
-
-  
-
 }

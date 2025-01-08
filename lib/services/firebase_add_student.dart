@@ -26,12 +26,14 @@ Future<DocumentReference> addStudent({
     return FirebaseFirestore.instance.collection('student').snapshots();
   }
 
-  Future<void> updateStudent(String docId, String fullName, String department) async {
-    await FirebaseFirestore.instance.collection('student').doc(docId).update({
-      'fullName': fullName,
-      'department': department,
-    });
-  }
+  Future<void> updateStudent(String docId, String fullName, String department, String rollNumber, String year) async {
+  await FirebaseFirestore.instance.collection('student').doc(docId).update({
+    'fullName': fullName,
+    'department': department,
+    'rollNumber': rollNumber,
+    'year': year,
+  });
+}
 
   Future<void> deleteStudent(String docId) async {
     await FirebaseFirestore.instance.collection('student').doc(docId).delete();
