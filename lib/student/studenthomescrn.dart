@@ -1,51 +1,49 @@
-import 'package:face_mark/student/attendanceScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:face_mark/student/attendanceScreen.dart';
 
-class StudentHomeScrn extends StatefulWidget {
-  const StudentHomeScrn({super.key});
+class StudentHomeScrn extends StatelessWidget {
+  final String studentName;
+  final String studentEmail;
 
-  @override
-  State<StudentHomeScrn> createState() => _StudentHomeScrnState();
-}
+  const StudentHomeScrn({super.key, required this.studentName, required this.studentEmail});
 
-class _StudentHomeScrnState extends State<StudentHomeScrn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Set a simple white background instead of a gradient
       body: Container(
-        color: Colors.white, // Simple white background color
+        color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Profile Picture (Circle Avatar)
+              // Simple Circle Avatar for the Profile Picture (no image picking)
               CircleAvatar(
                 radius: 75,
-                // backgroundImage: AssetImage('assets/images/profile.jpg'), // Placeholder image
-                backgroundColor:
-                    Colors.grey[300], // Fallback color if image is missing
+                backgroundColor: Colors.grey[300],
+                child: Icon(
+                  Icons.account_circle, 
+                  color: Colors.white, 
+                  size: 75,
+                ),  // Default icon for profile picture
               ),
               const SizedBox(height: 20),
 
-              // Student's Name
+              // Display Student's Name and Email
               Text(
-                'John Doe',
+                studentName,  // Using the passed name
                 style: TextStyle(
-                  color: Colors.black, // Black text for standard readability
+                  color: Colors.black,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 10),
 
-              // Student's Registration Number
               Text(
-                'Regno: 12345678',
+                studentEmail,  // Using the passed email
                 style: TextStyle(
-                  color: Colors
-                      .black54, // Light black color for the registration number
+                  color: Colors.black54,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -55,17 +53,17 @@ class _StudentHomeScrnState extends State<StudentHomeScrn> {
               // Attendance Bar
               GestureDetector(
                 onTap: () {
+                  // Navigate to the attendance screen if needed
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AttendanceScreen()));
+                    context,
+                    MaterialPageRoute(builder: (context) => const AttendanceScreen()),
+                  );
                 },
                 child: Container(
                   width: double.infinity,
                   height: 120,
                   decoration: BoxDecoration(
-                    color:
-                        Colors.white, // White background for the attendance box
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(15),
                     boxShadow: const [
                       BoxShadow(
@@ -85,7 +83,7 @@ class _StudentHomeScrnState extends State<StudentHomeScrn> {
                           Text(
                             'Attendance',
                             style: TextStyle(
-                              color: Colors.black, // Black text color
+                              color: Colors.black,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
@@ -94,8 +92,7 @@ class _StudentHomeScrnState extends State<StudentHomeScrn> {
                           Text(
                             '85% Present',
                             style: TextStyle(
-                              color: Colors
-                                  .black54, // Light black color for the sub-text
+                              color: Colors.black54,
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
                             ),
@@ -108,8 +105,7 @@ class _StudentHomeScrnState extends State<StudentHomeScrn> {
                         height: 10,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5),
-                          color: Colors
-                              .green, // Green color for the attendance progress
+                          color: Colors.green,
                         ),
                         child: FractionallySizedBox(
                           alignment: Alignment.centerLeft,

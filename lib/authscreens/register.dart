@@ -1,6 +1,5 @@
 import 'package:face_mark/authscreens/login.dart';
 import 'package:face_mark/services/firebase_auth_services.dart';
-
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -15,6 +14,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController roleController = TextEditingController();
+  final TextEditingController subjectController = TextEditingController();
+  final TextEditingController departmentController = TextEditingController();
   bool isVisible = false;
 
   void _register() async {
@@ -23,8 +24,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String fullName = fullNameController.text.trim();
     String role = roleController.text.trim().toLowerCase(); // Normalize the role
 
-    // Call the signup function
-    String? result = await signupUser(email, password, fullName, role);
+    String? result;
+
+    // Call the signup function with the additional fields for teacher/student
+    if (role == 'teacher') {
+      result = await signupUser(email, password, fullName, role, subject: subjectController.text.trim());
+    } else if (role == 'student') {
+      result = await signupUser(email, password, fullName, role, department: departmentController.text.trim());
+    } else {
+      result = await signupUser(email, password, fullName, role);
+    }
 
     if (result == null) {
       // Registration successful
@@ -71,6 +80,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
               _buildPasswordField(),
               const SizedBox(height: 20),
               _buildTextField('Role', 'Enter your role (admin, teacher, student)', roleController),
+              const SizedBox(height: 20),
+
+              // Conditionally display the subject or department field
+              if (roleController.text.trim().toLowerCase() == 'teacher')
+                _buildTextField('Subject', 'Enter your subject', subjectController),
+              if (roleController.text.trim().toLowerCase() == 'student')
+                _buildTextField('Department', 'Enter your department', departmentController),
+
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,

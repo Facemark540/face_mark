@@ -1,4 +1,3 @@
-
 import 'package:face_mark/authscreens/register.dart';
 import 'package:face_mark/services/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20),
               _buildPasswordField(),
               const SizedBox(height: 30),
+              // Elevated Button for login
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     backgroundColor: Colors.orange.shade700,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                   ),
-                  onPressed: _login,
+                  onPressed: _login,  // Call the _login function when pressed
                   child: const Text(
                     'Login',
                     style: TextStyle(

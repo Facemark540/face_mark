@@ -5,7 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-Future<String?> signupUser(String email, String password, String fullName, String role) async {
+Future<String?> signupUser(
+  String email,
+  String password,
+  String fullName,
+  String role, {
+  String? subject,
+  String? department,
+}) async {
   try {
     // Create user in Firebase Authentication
     UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -37,11 +44,19 @@ Future<String?> signupUser(String email, String password, String fullName, Strin
     });
 
     // Add user details to the role-specific collection
-    await FirebaseFirestore.instance.collection(collectionName).doc(userId).set({
+    Map<String, dynamic> roleSpecificData = {
       'userId': userId,
       'fullName': fullName,
       'email': email,
-    });
+    };
+
+    if (normalizedRole == 'teacher' && subject != null) {
+      roleSpecificData['subject'] = subject;
+    } else if (normalizedRole == 'student' && department != null) {
+      roleSpecificData['department'] = department;
+    }
+
+    await FirebaseFirestore.instance.collection(collectionName).doc(userId).set(roleSpecificData);
 
     return null; // Sign-up successful
   } catch (e) {
@@ -51,21 +66,27 @@ Future<String?> signupUser(String email, String password, String fullName, Strin
 
 Future<String?> loginUser(BuildContext context, String email, String password) async {
   try {
+    // Sign in user with Firebase Auth
     UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
     String userId = userCredential.user!.uid;
 
+    // Fetch user data from Firestore
     DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-
     if (userDoc.exists) {
       String role = userDoc['role'];
-
+      String fullName = userDoc['fullName'];
+      
+      // Navigate to the appropriate screen based on the role
       Widget homeScreen;
       if (role == 'admin') {
         homeScreen = AdminHomeScreen();
       } else if (role == 'teacher') {
         homeScreen = TeacherHomeScreen();
       } else if (role == 'student') {
-        homeScreen = StudentHomeScrn();
+        homeScreen = StudentHomeScrn(
+          studentName: fullName,  // Pass the full name of the student
+          studentEmail: email,    // Pass the email of the student
+        );
       } else {
         return 'Unknown role';
       }
