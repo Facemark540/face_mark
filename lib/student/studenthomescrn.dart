@@ -82,10 +82,10 @@ class StudentHomeScrn extends StatelessWidget {
                     ],
                   ),
                   padding: const EdgeInsets.all(16),
-                  child: Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -107,10 +107,10 @@ class StudentHomeScrn extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const Icon(
+                      Icon(
                         Icons.calendar_today,
                         size: 30,
-                        color: Colors.green,
+                        color: Color.fromARGB(255, 19, 53, 126),
                       ),
                     ],
                   ),

@@ -52,8 +52,8 @@ class _StudentAttendanceCalendarState extends State<StudentAttendanceCalendar> {
         shape: BoxShape.circle,
       );
     }
-    return const BoxDecoration(
-      color: Colors.grey,
+    return  BoxDecoration(
+      color: Colors.grey[200],
       shape: BoxShape.circle,
     );
   }
