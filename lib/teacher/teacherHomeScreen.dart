@@ -1,4 +1,3 @@
-import 'package:face_mark/teacher/editattendance.dart';
 import 'package:face_mark/teacher/uploadImageScreen.dart';
 import 'package:face_mark/teacher/viewstudent.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +23,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                 CrossAxisAlignment.center, // Center content horizontally
             children: [
               // Teacher Dashboard Title
-              Text(
+              const Text(
                 'Welcome, Teacher!',
                 style: TextStyle(
                   fontSize: 36, // Larger title font size
@@ -32,9 +31,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                   color: Colors.black, // Text color set to black for contrast
                   shadows: [
                     Shadow(
-                      color: Colors.grey.withOpacity(0.5),
+                      color: Colors.grey,
                       blurRadius: 8,
-                      offset: const Offset(2, 2),
+                      offset: Offset(2, 2),
                     ),
                   ],
                 ),
@@ -58,7 +57,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                       ),
                       elevation: 10, // Shadow effect for depth
                       shadowColor:
-                          Colors.black.withOpacity(0.3), // Shadow color
+                          Colors.black, // Shadow color
                     ),
                     onPressed: () {
                       Navigator.push(
@@ -91,13 +90,13 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                       ),
                       elevation: 10, // Shadow effect for depth
                       shadowColor:
-                          Colors.black.withOpacity(0.3), // Shadow color
+                          Colors.black, // Shadow color
                     ),
                     onPressed: () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ViewStudentScreen()));
+                              builder: (context) => const ViewStudentScreen()));
                     },
                     child: const Text(
                       'View Students',

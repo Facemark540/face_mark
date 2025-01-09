@@ -18,7 +18,7 @@ Future<DocumentReference> addStudent({
     'year': year,
   });
   ScaffoldMessenger.of(context)
-      .showSnackBar(SnackBar(content: Text("Student Added Succesfully")));
+      .showSnackBar(const SnackBar(content: Text("Student Added Succesfully")));
       return docref;
 }
 

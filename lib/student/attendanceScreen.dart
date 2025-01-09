@@ -10,8 +10,8 @@ class StudentAttendanceCalendar extends StatefulWidget {
   const StudentAttendanceCalendar({
     required this.studentId,
     required this.studentName,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<StudentAttendanceCalendar> createState() => _StudentAttendanceCalendarState();
@@ -70,8 +70,8 @@ class _StudentAttendanceCalendarState extends State<StudentAttendanceCalendar> {
             focusedDay: _focusedDay,
             firstDay: DateTime(2000),
             lastDay: DateTime(2100),
-            calendarStyle: CalendarStyle(
-              todayDecoration: const BoxDecoration(
+            calendarStyle: const CalendarStyle(
+              todayDecoration: BoxDecoration(
                 color: Colors.blue,
                 shape: BoxShape.circle,
               ),

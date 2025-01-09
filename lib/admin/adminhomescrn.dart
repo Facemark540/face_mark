@@ -35,19 +35,19 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => AddStudentScreen()));
+                                builder: (context) => const AddStudentScreen()));
                       },
                     ),
                     const SizedBox(height: 20),
                     _buildCardButton(
                       text: 'Add Teacher',
                       icon: Icons.person_add_alt_1,
-                      color: Color.fromARGB(255, 19, 53, 126),
+                      color: const Color.fromARGB(255, 19, 53, 126),
                       onTap: () {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => AddTeacherScreen()));
+                                builder: (context) => const AddTeacherScreen()));
                       },
                     ),
                     const SizedBox(height: 40),
@@ -66,21 +66,21 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color.fromARGB(255, 19, 53, 126),
-            const Color.fromARGB(255, 19, 53, 126)
+            Color.fromARGB(255, 19, 53, 126),
+            Color.fromARGB(255, 19, 53, 126)
           ], // Gradient from dark blue to light blue
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Welcome, Admin!',
             style: TextStyle(
               fontFamily: 'Roboto',
@@ -89,8 +89,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 10),
-          const Text(
+          SizedBox(height: 10),
+          Text(
             'Manage your students and teachers efficiently with the tools below.',
             style: TextStyle(
               fontFamily: 'Roboto',

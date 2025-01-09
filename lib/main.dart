@@ -1,15 +1,5 @@
-import 'package:face_mark/admin/addstudent.dart';
-import 'package:face_mark/admin/adminhomescrn.dart';
-import 'package:face_mark/authscreens/login.dart';
-import 'package:face_mark/authscreens/register.dart';
-import 'package:face_mark/authscreens/register.dart';
 import 'package:face_mark/firebase_options.dart';
 import 'package:face_mark/splashscreen.dart';
-import 'package:face_mark/student/attendanceScreen.dart';
-import 'package:face_mark/student/studenthomescrn.dart';
-import 'package:face_mark/teacher/editattendance.dart';
-import 'package:face_mark/teacher/teacherHomeScreen.dart';
-import 'package:face_mark/teacher/uploadImageScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 

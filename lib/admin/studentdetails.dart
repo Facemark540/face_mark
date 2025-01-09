@@ -39,13 +39,13 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
           stream: fetchStudents(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
-              return Center(child: Text('Something went wrong'));
+              return const Center(child: Text('Something went wrong'));
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(child: Text('No students found'));
+              return const Center(child: Text('No students found'));
             }
 
             return ListView(
@@ -87,7 +87,7 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
           contentPadding: const EdgeInsets.all(16),
           title: Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color.fromARGB(255, 19, 53, 126),
@@ -107,8 +107,8 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
                 onTap: () {
                   _showEditDialog(context, docId, title, subtitle);
                 },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
                   child: Icon(
                     Icons.edit,
                     color: Color.fromARGB(255, 19, 53, 126),
@@ -123,8 +123,8 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
                     SnackBar(content: Text('Student deleted successfully')),
                   );
                 },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
                   child: Icon(
                     Icons.delete,
                     color: Colors.orange,
@@ -149,25 +149,25 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Student'),
+          title: const Text('Edit Student'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Full Name'),
+                decoration: const InputDecoration(labelText: 'Full Name'),
               ),
               TextField(
                 controller: _departmentController,
-                decoration: InputDecoration(labelText: 'Department'),
+                decoration: const InputDecoration(labelText: 'Department'),
               ),
               TextField(
                 controller: _rollNumberController,
-                decoration: InputDecoration(labelText: 'Roll Number'),
+                decoration: const InputDecoration(labelText: 'Roll Number'),
               ),
               TextField(
                 controller: _yearController,
-                decoration: InputDecoration(labelText: 'Year'),
+                decoration: const InputDecoration(labelText: 'Year'),
               ),
             ],
           ),
@@ -176,7 +176,7 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -189,10 +189,10 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
                 });
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Student details updated successfully')),
+                  const SnackBar(content: Text('Student details updated successfully')),
                 );
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );

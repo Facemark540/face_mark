@@ -80,9 +80,9 @@ Future<String?> loginUser(BuildContext context, String email, String password) a
       // Navigate to the appropriate screen based on the role
       Widget homeScreen;
       if (role == 'admin') {
-        homeScreen = AdminHomeScreen();
+        homeScreen = const AdminHomeScreen();
       } else if (role == 'teacher') {
-        homeScreen = TeacherHomeScreen();
+        homeScreen = const TeacherHomeScreen();
       } else if (role == 'student') {
         homeScreen = StudentHomeScrn(
           studentName: fullName,  // Pass the full name of the student

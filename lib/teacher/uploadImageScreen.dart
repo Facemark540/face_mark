@@ -90,12 +90,12 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _uploadImage,
-                child:  Text('Upload Image',style: TextStyle(color: Colors.white),),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[800],
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   textStyle: const TextStyle(fontSize: 18),
                 ),
+                child:  const Text('Upload Image',style: TextStyle(color: Colors.white),),
               ),
             ],
           ),

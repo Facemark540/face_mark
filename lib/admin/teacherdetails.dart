@@ -3,6 +3,8 @@ import 'package:face_mark/services/firebase_add_teacher.dart';
 import 'package:flutter/material.dart';
 
 class TeacherDetailsScreen extends StatefulWidget {
+  const TeacherDetailsScreen({super.key});
+
   @override
   _TeacherDetailsScreenState createState() => _TeacherDetailsScreenState();
 }
@@ -14,7 +16,7 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           'Teacher Details',
           style: TextStyle(
@@ -39,13 +41,13 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
           stream: fetchTeachers(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
-              return Center(child: Text('Something went wrong'));
+              return const Center(child: Text('Something went wrong'));
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(child: Text('No teachers found'));
+              return const Center(child: Text('No teachers found'));
             }
 
             return ListView(
@@ -89,7 +91,7 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
           contentPadding: const EdgeInsets.all(16),
           title: Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color.fromARGB(255, 19, 53, 126),
@@ -122,8 +124,8 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
                 onTap: () {
                   _showEditDialog(context, docId, title, subtitle, qualifications);
                 },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
                   child: Icon(
                     Icons.edit,
                     color: Color.fromARGB(255, 19, 53, 126),
@@ -135,11 +137,11 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
                 onTap: () async {
                   await deleteTeacher(docId);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Teacher deleted successfully')),
+                    const SnackBar(content: Text('Teacher deleted successfully')),
                   );
                 },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
                   child: Icon(
                     Icons.delete,
                     color: Colors.orange,
@@ -171,15 +173,15 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
             children: [
               TextField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Full Name'),
+                decoration: const InputDecoration(labelText: 'Full Name'),
               ),
               TextField(
                 controller: _subjectController,
-                decoration: InputDecoration(labelText: 'Subject'),
+                decoration: const InputDecoration(labelText: 'Subject'),
               ),
               TextField(
                 controller: _qualificationsController,
-                decoration: InputDecoration(labelText: 'Qualifications'),
+                decoration: const InputDecoration(labelText: 'Qualifications'),
               ),
             ],
           ),
@@ -188,7 +190,7 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -202,10 +204,10 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
                 });
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Teacher details updated successfully')),
+                  const SnackBar(content: Text('Teacher details updated successfully')),
                 );
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );
