@@ -25,56 +25,54 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
           ),
         ),
         backgroundColor: const Color.fromARGB(255, 19, 53, 126),
-        elevation: 0, // Remove AppBar shadow
+        elevation: 0,
       ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue.shade100, Colors.blue.shade50],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            child: StreamBuilder<QuerySnapshot>(
-              stream: fetchTeachers(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                final teachers = snapshot.data!.docs;
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16.0),
-                  itemCount: teachers.length,
-                  itemBuilder: (context, index) {
-                    final teacher = teachers[index];
-                    return _buildDetailCard(
-                      title: teacher['fullName'],
-                      subtitle:
-                          '${teacher['subject']}',
-                      context: context,
-                      docId: teacher.id,
-                    );
-                  },
-                );
-              },
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blue.shade100, Colors.blue.shade50],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-          if (_isLoading)
-            Center(
-              child: CircularProgressIndicator(),
-            ),
-        ],
+        ),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: fetchTeachers(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Something went wrong'));
+            }
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return Center(child: Text('No teachers found'));
+            }
+
+            return ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: snapshot.data!.docs.map((document) {
+                final data = document.data() as Map<String, dynamic>;
+                return _buildDetailCard(
+                  docId: document.id,
+                  title: data['fullName'] ?? 'N/A',
+                  subtitle: data['subject'] ?? 'N/A',
+                  qualifications: data['qualifications'] ?? 'N/A',
+                  context: context,
+                );
+              }).toList(),
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget _buildDetailCard({
+    required String docId,
     required String title,
     required String subtitle,
+    required String qualifications,
     required BuildContext context,
-    required String docId,
   }) {
     return Card(
       elevation: 5,
@@ -97,19 +95,32 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
               color: Color.fromARGB(255, 19, 53, 126),
             ),
           ),
-          subtitle: Text(
-            subtitle,
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[800],
-            ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey[800],
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                'Qualifications: $qualifications',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
           ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               InkWell(
                 onTap: () {
-                  _showEditDialog(context, docId, title, subtitle);
+                  _showEditDialog(context, docId, title, subtitle, qualifications);
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -121,8 +132,11 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
                 ),
               ),
               InkWell(
-                onTap: () {
-                  deleteTeacher(docId);
+                onTap: () async {
+                  await deleteTeacher(docId);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Teacher deleted successfully')),
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -140,10 +154,12 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
     );
   }
 
-  void _showEditDialog(
-      BuildContext context, String docId, String currentName, String currentSubject) {
+  void _showEditDialog(BuildContext context, String docId, String currentName,
+      String currentSubject, String currentQualifications) {
     final _nameController = TextEditingController(text: currentName);
     final _subjectController = TextEditingController(text: currentSubject);
+    final _qualificationsController =
+        TextEditingController(text: currentQualifications);
 
     showDialog(
       context: context,
@@ -159,7 +175,11 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
               ),
               TextField(
                 controller: _subjectController,
-                 decoration: InputDecoration(labelText: 'Subject'),
+                decoration: InputDecoration(labelText: 'Subject'),
+              ),
+              TextField(
+                controller: _qualificationsController,
+                decoration: InputDecoration(labelText: 'Qualifications'),
               ),
             ],
           ),
@@ -175,13 +195,14 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
                 setState(() {
                   _isLoading = true;
                 });
-                await updateTeacher(docId, _nameController.text, _subjectController.text);
+                await updateTeacher(docId, _nameController.text,
+                    _subjectController.text, _qualificationsController.text);
                 setState(() {
                   _isLoading = false;
                 });
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Data saved successfully')),
+                  SnackBar(content: Text('Teacher details updated successfully')),
                 );
               },
               child: Text('Save'),
