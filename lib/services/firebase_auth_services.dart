@@ -75,6 +75,7 @@ Future<String?> loginUser(BuildContext context, String email, String password) a
     if (userDoc.exists) {
       String role = userDoc['role'];
       String fullName = userDoc['fullName'];
+      String studentId= userDoc['userId'];
       
       // Navigate to the appropriate screen based on the role
       Widget homeScreen;
@@ -85,7 +86,7 @@ Future<String?> loginUser(BuildContext context, String email, String password) a
       } else if (role == 'student') {
         homeScreen = StudentHomeScrn(
           studentName: fullName,  // Pass the full name of the student
-          studentEmail: email,    // Pass the email of the student
+          studentEmail: email, studentId: studentId,    // Pass the email of the student
         );
       } else {
         return 'Unknown role';

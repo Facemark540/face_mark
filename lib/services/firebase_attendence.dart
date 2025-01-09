@@ -11,10 +11,10 @@ Future<void> saveAttendance({
   try {
     await FirebaseFirestore.instance.collection('attendance').doc(studentId).set({
       'studentName': studentName,
-      'attendance': attendance, // Maps attendance dates to true/false
+      'attendance': attendance,
       'month': month,
       'year': year,
-    }, SetOptions(merge: true)); // Merge ensures existing data is retained
+    }, SetOptions(merge: true));
     print("Attendance saved successfully!");
   } catch (e) {
     print("Error saving attendance: $e");
@@ -26,10 +26,9 @@ Future<void> saveAttendance({
 Future<Map<String, dynamic>?> fetchAttendance(String studentId) async {
   try {
     var doc = await FirebaseFirestore.instance.collection('attendance').doc(studentId).get();
-
     if (doc.exists) {
       print("Attendance data fetched successfully.");
-      return doc.data(); // Return the entire document as a Map
+      return doc.data();
     } else {
       print("No attendance data found for studentId: $studentId");
       return null;

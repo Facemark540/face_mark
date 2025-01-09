@@ -1,11 +1,18 @@
-import 'package:flutter/material.dart';
 import 'package:face_mark/student/attendanceScreen.dart';
+import 'package:flutter/material.dart';
+
 
 class StudentHomeScrn extends StatelessWidget {
   final String studentName;
   final String studentEmail;
+  final String studentId; // Added studentId for navigation
 
-  const StudentHomeScrn({super.key, required this.studentName, required this.studentEmail});
+  const StudentHomeScrn({
+    super.key,
+    required this.studentName,
+    required this.studentEmail,
+    required this.studentId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,22 +24,20 @@ class StudentHomeScrn extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Simple Circle Avatar for the Profile Picture (no image picking)
               CircleAvatar(
                 radius: 75,
                 backgroundColor: Colors.grey[300],
-                child: Icon(
-                  Icons.account_circle, 
-                  color: Colors.white, 
+                child: const Icon(
+                  Icons.account_circle,
+                  color: Colors.white,
                   size: 75,
-                ),  // Default icon for profile picture
+                ),
               ),
               const SizedBox(height: 20),
 
-              // Display Student's Name and Email
               Text(
-                studentName,  // Using the passed name
-                style: TextStyle(
+                studentName,
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -41,8 +46,8 @@ class StudentHomeScrn extends StatelessWidget {
               const SizedBox(height: 10),
 
               Text(
-                studentEmail,  // Using the passed email
-                style: TextStyle(
+                studentEmail,
+                style: const TextStyle(
                   color: Colors.black54,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -50,13 +55,16 @@ class StudentHomeScrn extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              // Attendance Bar
               GestureDetector(
                 onTap: () {
-                  // Navigate to the attendance screen if needed
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AttendanceScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => StudentAttendanceCalendar(
+                        studentId: studentId,
+                        studentName: studentName,
+                      ),
+                    ),
                   );
                 },
                 child: Container(
@@ -90,7 +98,7 @@ class StudentHomeScrn extends StatelessWidget {
                           ),
                           SizedBox(height: 5),
                           Text(
-                            '85% Present',
+                            'View Attendance Records',
                             style: TextStyle(
                               color: Colors.black54,
                               fontSize: 16,
@@ -99,19 +107,10 @@ class StudentHomeScrn extends StatelessWidget {
                           ),
                         ],
                       ),
-                      // Attendance Progress Bar
-                      Container(
-                        width: 100,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.green,
-                        ),
-                        child: FractionallySizedBox(
-                          alignment: Alignment.centerLeft,
-                          widthFactor: 0.85, // Adjust the progress here (85%)
-                          child: Container(),
-                        ),
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 30,
+                        color: Colors.green,
                       ),
                     ],
                   ),
