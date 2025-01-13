@@ -1,8 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:face_mark/admin/addstudent.dart';
 import 'package:face_mark/admin/addteacher.dart';
 import 'package:face_mark/admin/studentdetails.dart';
 import 'package:face_mark/admin/teacherdetails.dart';
-import 'package:face_mark/authscreens/register.dart';
 import 'package:flutter/material.dart';
 
 class AdminHomeScreen extends StatefulWidget {
@@ -13,52 +13,83 @@ class AdminHomeScreen extends StatefulWidget {
 }
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
+  int studentCount = 0;
+  int teacherCount = 0;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCounts();
+  }
+
+  Future<void> _fetchCounts() async {
+    try {
+      QuerySnapshot studentSnapshot = await FirebaseFirestore.instance.collection('student').get();
+      QuerySnapshot teacherSnapshot = await FirebaseFirestore.instance.collection('teacher').get();
+
+      setState(() {
+        studentCount = studentSnapshot.docs.length;
+        teacherCount = teacherSnapshot.docs.length;
+        isLoading = false;
+      });
+    } catch (e) {
+      // Handle error
+      print('Error fetching counts: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.grey.shade100,
-        child: Column(
-          children: [
-            _buildWelcomeSection(),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildCardButton(
-                      text: 'Add Student',
-                      icon: Icons.person_add,
-                      color: Colors.orange.shade700,
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const AddStudentScreen()));
-                      },
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Container(
+              color: Colors.grey.shade100,
+              child: Column(
+                children: [
+                  _buildWelcomeSection(),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildCardButton(
+                            text: 'Add Student',
+                            icon: Icons.person_add,
+                            color: Colors.orange.shade700,
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const AddStudentScreen()));
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          _buildCardButton(
+                            text: 'Add Teacher',
+                            icon: Icons.person_add_alt_1,
+                            color: const Color.fromARGB(255, 19, 53, 126),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const AddTeacherScreen()));
+                            },
+                          ),
+                          const SizedBox(height: 40),
+                          _buildQuickInfoSection(),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    _buildCardButton(
-                      text: 'Add Teacher',
-                      icon: Icons.person_add_alt_1,
-                      color: const Color.fromARGB(255, 19, 53, 126),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const AddTeacherScreen()));
-                      },
-                    ),
-                    const SizedBox(height: 40),
-                    _buildQuickInfoSection(),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -161,27 +192,27 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           children: [
             _buildInfoCard(
               title: 'Students',
-              value: '120',
+              value: studentCount.toString(),
               color: Colors.orange.shade700,
               icon: Icons.people,
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => StudentDetailsScreen()),
+                      builder: (context) =>  StudentDetailsScreen()),
                 );
               },
             ),
             _buildInfoCard(
               title: 'Teachers',
-              value: '15',
+              value: teacherCount.toString(),
               color: const Color.fromARGB(255, 19, 53, 126),
               icon: Icons.school,
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => TeacherDetailsScreen()),
+                      builder: (context) => const TeacherDetailsScreen()),
                 );
               },
             ),

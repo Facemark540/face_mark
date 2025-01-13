@@ -107,7 +107,7 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
                   color: Colors.grey[800],
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 'Qualifications: $qualifications',
                 style: TextStyle(
@@ -167,7 +167,7 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Teacher'),
+          title: const Text('Edit Teacher'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

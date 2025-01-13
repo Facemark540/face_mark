@@ -123,8 +123,8 @@ class _StudentAttendanceCalendarState extends State<StudentAttendanceCalendar> {
                 firstDay: DateTime(2000),
                 lastDay: DateTime(2100),
                 calendarStyle: CalendarStyle(
-                  todayDecoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 19, 53, 126),
+                  todayDecoration: const BoxDecoration(
+                    color: Color.fromARGB(255, 19, 53, 126),
                     shape: BoxShape.circle,
                   ),
                   defaultDecoration: BoxDecoration(
