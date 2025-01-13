@@ -13,24 +13,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController roleController = TextEditingController();
   final TextEditingController subjectController = TextEditingController();
-  final TextEditingController departmentController = TextEditingController();
   bool isVisible = false;
+  String selectedRole = 'admin';
 
   void _register() async {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
     String fullName = fullNameController.text.trim();
-    String role = roleController.text.trim().toLowerCase(); // Normalize the role
+    String role = selectedRole.toLowerCase(); // Normalize the role
 
     String? result;
 
-    // Call the signup function with the additional fields for teacher/student
+    // Call the signup function with the additional fields for teacher
     if (role == 'teacher') {
       result = await signupUser(email, password, fullName, role, subject: subjectController.text.trim());
-    } else if (role == 'student') {
-      result = await signupUser(email, password, fullName, role, department: departmentController.text.trim());
     } else {
       result = await signupUser(email, password, fullName, role);
     }
@@ -79,14 +76,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 20),
               _buildPasswordField(),
               const SizedBox(height: 20),
-              _buildTextField('Role', 'Enter your role (admin, teacher, student)', roleController),
+              _buildRoleDropdown(),
               const SizedBox(height: 20),
 
-              // Conditionally display the subject or department field
-              if (roleController.text.trim().toLowerCase() == 'teacher')
+              // Conditionally display the subject field for teachers
+              if (selectedRole == 'teacher')
                 _buildTextField('Subject', 'Enter your subject', subjectController),
-              if (roleController.text.trim().toLowerCase() == 'student')
-                _buildTextField('Department', 'Enter your department', departmentController),
 
               const SizedBox(height: 30),
               SizedBox(
@@ -197,6 +192,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
               borderSide: BorderSide(color: Colors.grey),
             ),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRoleDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Role',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
+        DropdownButton<String>(
+          value: selectedRole,
+          onChanged: (String? newValue) {
+            setState(() {
+              selectedRole = newValue!;
+            });
+          },
+          items: <String>['admin', 'teacher']
+              .map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style: const TextStyle(color: Colors.grey),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );

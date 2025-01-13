@@ -63,39 +63,59 @@ Future<String?> signupUser(
     return e.toString(); // Return error message
   }
 }
-
 Future<String?> loginUser(BuildContext context, String email, String password) async {
   try {
     // Sign in user with Firebase Auth
     UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
     String userId = userCredential.user!.uid;
 
-    // Fetch user data from Firestore
+    // Fetch user data from Firestore (the general 'users' collection)
     DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
     if (userDoc.exists) {
       String role = userDoc['role'];
       String fullName = userDoc['fullName'];
-      String studentId= userDoc['userId'];
-      
-      // Navigate to the appropriate screen based on the role
-      Widget homeScreen;
+      String studentId = userDoc['userId'];
+
+      // Check role and handle navigation
       if (role == 'admin') {
-        homeScreen = const AdminHomeScreen();
-      } else if (role == 'teacher') {
-        homeScreen = const TeacherHomeScreen();
-      } else if (role == 'student') {
-        homeScreen = StudentHomeScrn(
-          studentName: fullName,  // Pass the full name of the student
-          studentEmail: email, studentId: studentId,    // Pass the email of the student
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminHomeScreen()),
         );
+      } else if (role == 'teacher') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const TeacherHomeScreen()),
+        );
+      } else if (role == 'student') {
+        // Fetch student-specific data from the 'student' collection
+        DocumentSnapshot studentDoc = await FirebaseFirestore.instance.collection('student').doc(userId).get();
+
+        if (studentDoc.exists) {
+          // Validate if the student's email and password match the stored details
+          String storedEmail = studentDoc['email'];
+
+          if (storedEmail == email) {
+            // If credentials match, navigate to the Student Home Screen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => StudentHomeScrn(
+                  studentName: fullName,
+                  studentEmail: email,
+                  studentId: studentId,
+                ),
+              ),
+            );
+          } else {
+            return 'Invalid credentials for student';
+          }
+        } else {
+          return 'Student data not found';
+        }
       } else {
         return 'Unknown role';
       }
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => homeScreen),
-      );
     } else {
       return 'User data not found in Firestore';
     }

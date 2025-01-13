@@ -14,14 +14,13 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           'Student Details',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            letterSpacing: 1.2,
           ),
         ),
         backgroundColor: const Color.fromARGB(255, 19, 53, 126),
@@ -54,8 +53,7 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
                 final data = document.data() as Map<String, dynamic>;
                 return _buildDetailCard(
                   docId: document.id,
-                  title: data['fullName'] ?? 'N/A',
-                  subtitle: '${data['department'] ?? 'N/A'}',
+                  data: data,
                   context: context,
                 );
               }).toList(),
@@ -68,8 +66,7 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
 
   Widget _buildDetailCard({
     required String docId,
-    required String title,
-    required String subtitle,
+    required Map<String, dynamic> data,
     required BuildContext context,
   }) {
     return Card(
@@ -79,114 +76,86 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
       ),
       margin: const EdgeInsets.symmetric(vertical: 10),
       color: Colors.white,
-      child: InkWell(
-        onTap: () {
-          print('Tapped on $title');
-        },
-        child: ListTile(
-          contentPadding: const EdgeInsets.all(16),
-          title: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 19, 53, 126),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        title: Text(
+          data['fullName'] ?? 'N/A',
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 19, 53, 126),
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Department: ${data['department'] ?? 'N/A'}'),
+            Text('Roll Number: ${data['rollNumber'] ?? 'N/A'}'),
+            Text('Year: ${data['year'] ?? 'N/A'}'),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit, color: Color.fromARGB(255, 19, 53, 126)),
+              onPressed: () => _showEditDialog(context, docId, data),
             ),
-          ),
-          subtitle: Text(
-            subtitle,
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[800],
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.orange),
+              onPressed: () async {
+                await deleteStudent(docId);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Student deleted successfully')),
+                );
+              },
             ),
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              InkWell(
-                onTap: () {
-                  _showEditDialog(context, docId, title, subtitle);
-                },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Icon(
-                    Icons.edit,
-                    color: Color.fromARGB(255, 19, 53, 126),
-                    size: 26,
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () async {
-                  await deleteStudent(docId);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Student deleted successfully')),
-                  );
-                },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Icon(
-                    Icons.delete,
-                    color: Colors.orange,
-                    size: 26,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );
   }
 
-  void _showEditDialog(BuildContext context, String docId, String currentName, String currentDepartment) {
-    final _nameController = TextEditingController(text: currentName);
-    final _departmentController = TextEditingController(text: currentDepartment);
-    final _rollNumberController = TextEditingController(text: '');
-    final _yearController = TextEditingController(text: '');
+  void _showEditDialog(BuildContext context, String docId, Map<String, dynamic> currentData) {
+    final _nameController = TextEditingController(text: currentData['fullName']);
+    final _departmentController = TextEditingController(text: currentData['department']);
+    final _rollNumberController = TextEditingController(text: currentData['rollNumber']);
+    final _yearController = TextEditingController(text: currentData['year']);
+    final _passwordController = TextEditingController(text: currentData['password']);
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Edit Student'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Full Name'),
-              ),
-              TextField(
-                controller: _departmentController,
-                decoration: const InputDecoration(labelText: 'Department'),
-              ),
-              TextField(
-                controller: _rollNumberController,
-                decoration: const InputDecoration(labelText: 'Roll Number'),
-              ),
-              TextField(
-                controller: _yearController,
-                decoration: const InputDecoration(labelText: 'Year'),
-              ),
-            ],
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(controller: _nameController, decoration: const InputDecoration(labelText: 'Full Name')),
+                TextField(controller: _departmentController, decoration: const InputDecoration(labelText: 'Department')),
+                TextField(controller: _rollNumberController, decoration: const InputDecoration(labelText: 'Roll Number')),
+                TextField(controller: _yearController, decoration: const InputDecoration(labelText: 'Year')),
+                TextField(controller: _passwordController, decoration: const InputDecoration(labelText: 'Password')),
+              ],
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
-                setState(() {
-                  _isLoading = true;
-                });
-                await updateStudent(docId, _nameController.text, _departmentController.text, _rollNumberController.text, _yearController.text);
-                setState(() {
-                  _isLoading = false;
-                });
+                setState(() => _isLoading = true);
+                await updateStudent(
+                  docId: docId,
+                 fullName:  _nameController.text,
+                  department:  _departmentController.text,
+                 rollNumber:  _rollNumberController.text,
+                 year:  _yearController.text,
+                password:   _passwordController.text,
+                );
+                setState(() => _isLoading = false);
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Student details updated successfully')),

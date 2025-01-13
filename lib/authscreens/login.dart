@@ -23,6 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // Login successful, redirection handled by loginUser function
     } else {
       // Show error message
+      print(result);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result)));
     }
   }

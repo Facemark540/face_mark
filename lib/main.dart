@@ -1,3 +1,4 @@
+import 'package:face_mark/admin/adminhomescrn.dart';
 import 'package:face_mark/firebase_options.dart';
 import 'package:face_mark/splashscreen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
      
       debugShowCheckedModeBanner: false,
-      home:   SplashScreen(),
+      home:  SplashScreen(),
     );
   }
 }
