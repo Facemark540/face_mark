@@ -40,7 +40,9 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-       backgroundColor:  Color.fromARGB(255, 19, 53, 126),foregroundColor: Colors.white,),
+        backgroundColor: Color.fromARGB(255, 19, 53, 126),
+        foregroundColor: Colors.white,
+      ),
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
