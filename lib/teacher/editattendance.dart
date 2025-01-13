@@ -26,11 +26,9 @@ class _AttendanceCalendarState extends State<AttendanceCalendar> {
     _fetchAttendance(); // Fetch attendance when the screen initializes
   }
 
-  /// Toggles attendance (present/absent) for a specific day.
   void _toggleAttendance(DateTime day) {
     String dateKey = "${day.year}-${day.month}-${day.day}";
     setState(() {
-      // Toggle attendance status or mark as present if not recorded
       if (_attendance.containsKey(dateKey)) {
         _attendance[dateKey] = !_attendance[dateKey]!;
       } else {
@@ -39,7 +37,6 @@ class _AttendanceCalendarState extends State<AttendanceCalendar> {
     });
   }
 
-  /// Fetches attendance from Firebase and updates the UI.
   Future<void> _fetchAttendance() async {
     try {
       var data = await fetchAttendance(widget.studentId);
@@ -55,7 +52,6 @@ class _AttendanceCalendarState extends State<AttendanceCalendar> {
     }
   }
 
-  /// Saves the current attendance data to Firebase.
   Future<void> _saveAttendance() async {
     try {
       await saveAttendance(
@@ -75,17 +71,15 @@ class _AttendanceCalendarState extends State<AttendanceCalendar> {
     }
   }
 
-  /// Returns the color decoration for a given day based on attendance status.
   BoxDecoration _getDayDecoration(DateTime day) {
     String dateKey = "${day.year}-${day.month}-${day.day}";
     if (_attendance.containsKey(dateKey)) {
-      // Mark attendance as green (present) or red (absent)
       return BoxDecoration(
-        color: _attendance[dateKey]! ? Colors.green : Colors.red,
+        color:
+            _attendance[dateKey]! ? Colors.green.shade400 : Colors.red.shade400,
         shape: BoxShape.circle,
       );
     }
-    // Neutral decoration for days with no attendance record
     return const BoxDecoration(
       color: Colors.grey,
       shape: BoxShape.circle,
@@ -96,64 +90,86 @@ class _AttendanceCalendarState extends State<AttendanceCalendar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Attendance: ${widget.studentName}'),
+        title: Text(
+          'Attendance: ${widget.studentName}',
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color.fromARGB(255, 19, 53, 126),
+        foregroundColor: Colors.white,
+        centerTitle: true,
       ),
-      body: Column(
-        children: [
-          // Calendar to display attendance
-          TableCalendar(
-            focusedDay: _focusedDay,
-            firstDay: DateTime(2000),
-            lastDay: DateTime(2100),
-            calendarStyle: const CalendarStyle(
-              todayDecoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
+      body: Container(
+        color: Colors.grey.shade100,
+        child: Column(
+          children: [
+            // Calendar Section
+            TableCalendar(
+              focusedDay: _focusedDay,
+              firstDay: DateTime(2000),
+              lastDay: DateTime(2100),
+              calendarStyle: CalendarStyle(
+                todayDecoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 19, 53, 126),
+                  shape: BoxShape.circle,
+                ),
+                outsideDaysVisible: false,
               ),
-              outsideDaysVisible: true, // Show all days, even outside current month
-            ),
-            calendarBuilders: CalendarBuilders(
-              // Custom decoration for each day
-              defaultBuilder: (context, day, focusedDay) {
-                return Container(
-                  decoration: _getDayDecoration(day),
-                  alignment: Alignment.center,
-                  child: Text(
-                    '${day.day}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                );
-              },
-              todayBuilder: (context, day, focusedDay) {
-                return Container(
-                  decoration: _getDayDecoration(day),
-                  alignment: Alignment.center,
-                  child: Text(
-                    '${day.day}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+              calendarBuilders: CalendarBuilders(
+                defaultBuilder: (context, day, focusedDay) {
+                  return Container(
+                    decoration: _getDayDecoration(day),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${day.day}',
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
-                  ),
-                );
+                  );
+                },
+                todayBuilder: (context, day, focusedDay) {
+                  return Container(
+                    decoration: _getDayDecoration(day),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${day.day}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _focusedDay = focusedDay;
+                  _toggleAttendance(selectedDay);
+                });
               },
             ),
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _focusedDay = focusedDay;
-                _toggleAttendance(selectedDay);
-              });
-            },
-          ),
-          // Save Button
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: _saveAttendance,
-              child: const Text("Save Attendance"),
+            const Spacer(),
+            // Save Button
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: _saveAttendance,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 19, 53, 126),
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  "Save Attendance",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

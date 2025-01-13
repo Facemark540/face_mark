@@ -46,7 +46,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                   // Upload Photo Button
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent, // Button color
+                      backgroundColor: const Color.fromARGB(
+                          255, 19, 53, 126), // Button color
                       fixedSize: const Size(
                           250, 60), // Fixed size for better alignment
                       padding: const EdgeInsets.symmetric(
@@ -56,8 +57,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                             BorderRadius.circular(15), // More rounded corners
                       ),
                       elevation: 10, // Shadow effect for depth
-                      shadowColor:
-                          Colors.black, // Shadow color
+                      shadowColor: Colors.black, // Shadow color
                     ),
                     onPressed: () {
                       Navigator.push(
@@ -79,7 +79,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                   // View Students Button
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent, // Button color
+                      backgroundColor: const Color.fromARGB(
+                          255, 19, 53, 126), // Button color
                       padding: const EdgeInsets.symmetric(
                           vertical: 18, horizontal: 40),
                       fixedSize: const Size(
@@ -89,8 +90,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                             BorderRadius.circular(15), // More rounded corners
                       ),
                       elevation: 10, // Shadow effect for depth
-                      shadowColor:
-                          Colors.black, // Shadow color
+                      shadowColor: Colors.black, // Shadow color
                     ),
                     onPressed: () {
                       Navigator.push(

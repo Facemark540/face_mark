@@ -13,60 +13,104 @@ class ViewStudentScreen extends StatefulWidget {
 class _ViewStudentScreenState extends State<ViewStudentScreen> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('View Students'),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'View Students',
+          style: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        body: StreamBuilder<QuerySnapshot>(
+        backgroundColor: const Color.fromARGB(255, 19, 53, 126),
+        foregroundColor: Colors.white,
+        centerTitle: true,
+      ),
+      body: Container(
+        color: Colors.grey.shade100,
+        child: StreamBuilder<QuerySnapshot>(
           stream: fetchStudents(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
             }
 
             var students = snapshot.data!.docs;
 
+            if (students.isEmpty) {
+              return const Center(
+                child: Text(
+                  "No students available.",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey,
+                  ),
+                ),
+              );
+            }
+
             return ListView.builder(
+              padding: const EdgeInsets.all(16),
               itemCount: students.length,
               itemBuilder: (context, index) {
                 var student = students[index];
 
                 return Container(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
                       BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 5,
-                        offset: Offset(0, 2),
+                        color: Colors.grey.shade300,
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: Row(
                     children: [
-                      // Column for name, roll number, and register number
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            student['fullName'],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                      // Student details
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              student['fullName'],
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
                             ),
-                          ),
-                          Text('Roll Number: ${student['rollNumber']}'),
-                          Text('Department: ${student['department']}'),
-                          Text('Year: ${student['year']}'),
-                        ],
+                            const SizedBox(height: 8),
+                            Text(
+                              'Roll Number: ${student['rollNumber']}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                            Text(
+                              'Department: ${student['department']}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                            Text(
+                              'Year: ${student['year']}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      const Spacer(),
-                      // "View Attendance" button aligned to the right
+                      // View Attendance button
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
@@ -81,13 +125,22 @@ class _ViewStudentScreenState extends State<ViewStudentScreen> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                          backgroundColor:
+                              const Color.fromARGB(255, 19, 53, 126),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                        ),
+                        child: const Text(
+                          'View',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        child: const Center(child: Text('View')),
                       ),
                     ],
                   ),

@@ -13,7 +13,8 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
   File? _image;
 
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
@@ -38,6 +39,8 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+       backgroundColor:  Color.fromARGB(255, 19, 53, 126),foregroundColor: Colors.white,),
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -80,7 +83,8 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
                         const SizedBox(height: 10),
                         Text(
                           'Choose Image',
-                          style: TextStyle(fontSize: 16, color: Colors.blue[800]),
+                          style:
+                              TextStyle(fontSize: 16, color: Colors.blue[800]),
                         ),
                       ],
                     ),
@@ -92,10 +96,14 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
                 onPressed: _uploadImage,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[800],
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   textStyle: const TextStyle(fontSize: 18),
                 ),
-                child:  const Text('Upload Image',style: TextStyle(color: Colors.white),),
+                child: const Text(
+                  'Upload Image',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
