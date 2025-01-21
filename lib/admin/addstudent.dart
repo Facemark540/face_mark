@@ -1,6 +1,9 @@
-import 'package:face_mark/admin/studentdetails.dart';
+import 'dart:io';
 import 'package:face_mark/services/firebase_add_student.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'studentdetails.dart';
+
 
 class AddStudentScreen extends StatefulWidget {
   const AddStudentScreen({super.key});
@@ -17,26 +20,73 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   final TextEditingController _yearController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  File? _selectedImage;
+
+  void _pickImage() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _selectedImage = File(pickedImage.path);
+      });
+    }
+  }
+
+  void _clearFields() {
+    _fullNameController.clear();
+    _emailController.clear();
+    _rollNumberController.clear();
+    _departmentController.clear();
+    _yearController.clear();
+    _passwordController.clear();
+    setState(() {
+      _selectedImage = null;
+    });
+  }
+
+  Future<void> _handleSubmit() async {
+    try {
+      await addStudentToFirebase(
+        fullName: _fullNameController.text,
+        email: _emailController.text,
+        rollNumber: _rollNumberController.text,
+        department: _departmentController.text,
+        year: _yearController.text,
+        password: _passwordController.text,
+        imageFile: _selectedImage,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Student Added Successfully")),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => StudentDetailsScreen()),
+      );
+
+      _clearFields();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // Back icon
-          onPressed: () {
-            Navigator.pop(context); // Pops the current screen off the navigation stack
-          },
-        ),
-        title: const Text(
-          'Add Student',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: const Color.fromARGB(255, 19, 53, 126), // Dark blue color for AppBar
+        title: const Text('Add Student'),
+        backgroundColor: const Color.fromARGB(255, 19, 53, 126),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: ListView(
-          children: <Widget>[
+          children: [
+            _buildImagePicker(),
+            const SizedBox(height: 15),
             _buildTextField(controller: _fullNameController, label: 'Student Name'),
             const SizedBox(height: 15),
             _buildTextField(controller: _rollNumberController, label: 'Roll Number', keyboardType: TextInputType.number),
@@ -50,48 +100,37 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
             _buildTextField(controller: _passwordController, label: 'Password', obscureText: true),
             const SizedBox(height: 25),
             ElevatedButton(
-              onPressed: () async {
-                await addStudent(
-                  fullName: _fullNameController.text,
-                  email: _emailController.text,
-                  rollNumber: _rollNumberController.text,
-                  department: _departmentController.text,
-                  year: _yearController.text,
-                  password: _passwordController.text,  // Added password field
-                  context: context,
-                );
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => StudentDetailsScreen()),
-                );
-
-                _fullNameController.clear();
-                _emailController.clear();
-                _rollNumberController.clear();
-                _departmentController.clear();
-                _yearController.clear();
-                _passwordController.clear();
-              },
+              onPressed: _handleSubmit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 255, 111, 0), // Orange button color
+                backgroundColor: const Color.fromARGB(255, 255, 111, 0),
                 padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15), // Rounded corners for button
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
               ),
               child: const Text(
                 'Submit',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildImagePicker() {
+    return Column(
+      children: [
+        if (_selectedImage != null)
+          Image.file(
+            _selectedImage!,
+            height: 150,
+            width: 150,
+            fit: BoxFit.cover,
+          )
+        else
+          const Icon(Icons.person, size: 100, color: Colors.grey),
+        TextButton(onPressed: _pickImage, child: const Text('Pick an Image')),
+      ],
     );
   }
 
@@ -107,17 +146,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       obscureText: obscureText,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.grey), // Grey text for labels
-        filled: true, // Background of the text field is filled with white
-        fillColor: Colors.white, // White background for the text field
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15), // Rounded corners for text field
-          borderSide: BorderSide(color: Colors.grey.shade300), // Soft grey border color
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: Color.fromARGB(255, 19, 53, 126)), // Dark blue focused border
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
       ),
     );
   }

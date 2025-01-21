@@ -8,6 +8,7 @@ Future<DocumentReference> addTeacher({
   required String phoneNumber,
   required String subject,
   required String qualifications,
+  required String password,
   required BuildContext context,
 }) async {
   DocumentReference docref = await FirebaseFirestore.instance.collection('teacher').add({
@@ -16,6 +17,7 @@ Future<DocumentReference> addTeacher({
     'phoneNumber': phoneNumber,
     'subject': subject,
     'qualifications': qualifications,
+    'password': password, 
   });
   ScaffoldMessenger.of(context)
       .showSnackBar(const SnackBar(content: Text("Teacher Added Successfully")));

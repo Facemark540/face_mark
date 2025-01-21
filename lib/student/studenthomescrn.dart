@@ -1,10 +1,11 @@
-import 'package:face_mark/student/attendanceScreen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:face_mark/student/attendanceScreen.dart';
 
-class StudentHomeScrn extends StatelessWidget {
+class StudentHomeScrn extends StatefulWidget {
   final String studentName;
   final String studentEmail;
-  final String studentId; // Added studentId for navigation
+  final String studentId; // Added studentId for fetching image
 
   const StudentHomeScrn({
     super.key,
@@ -12,6 +13,34 @@ class StudentHomeScrn extends StatelessWidget {
     required this.studentEmail,
     required this.studentId,
   });
+
+  @override
+  State<StudentHomeScrn> createState() => _StudentHomeScrnState();
+}
+
+class _StudentHomeScrnState extends State<StudentHomeScrn> {
+  String? imageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchStudentImage();
+  }
+
+  Future<void> _fetchStudentImage() async {
+    try {
+      DocumentSnapshot studentDoc = await FirebaseFirestore.instance
+          .collection('student')
+          .doc(widget.studentId)
+          .get();
+
+      setState(() {
+        imageUrl = studentDoc['imageUrl'] as String?; // Fetch image URL
+      });
+    } catch (e) {
+      print("Error fetching image: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,15 +59,20 @@ class StudentHomeScrn extends StatelessWidget {
                     CircleAvatar(
                       radius: 70,
                       backgroundColor: Colors.orange.shade700,
-                      child: const Icon(
-                        Icons.account_circle,
-                        color: Colors.white,
-                        size: 80,
-                      ),
+                      backgroundImage: imageUrl != null
+                          ? NetworkImage(imageUrl!) // Use the fetched image URL
+                          : null,
+                      child: imageUrl == null
+                          ? const Icon(
+                              Icons.account_circle,
+                              color: Colors.white,
+                              size: 80,
+                            )
+                          : null,
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      studentName,
+                      widget.studentName,
                       style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -47,7 +81,7 @@ class StudentHomeScrn extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      studentEmail,
+                      widget.studentEmail,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -65,8 +99,8 @@ class StudentHomeScrn extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => StudentAttendanceCalendar(
-                              studentId: studentId,
-                              studentName: studentName,
+                              studentId: widget.studentId,
+                              studentName: widget.studentName,
                             ),
                           ),
                         );

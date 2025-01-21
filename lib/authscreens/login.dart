@@ -1,4 +1,3 @@
-import 'package:face_mark/authscreens/register.dart';
 import 'package:face_mark/services/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
 
@@ -24,7 +23,8 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       // Show error message
       print(result);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(result)));
     }
   }
 
@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     backgroundColor: Colors.orange.shade700,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                   ),
-                  onPressed: _login,  // Call the _login function when pressed
+                  onPressed: _login, // Call the _login function when pressed
                   child: const Text(
                     'Login',
                     style: TextStyle(
@@ -71,27 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Don\'t have an account? ',
-                      style: TextStyle(fontFamily: 'Roboto', color: Colors.grey)),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>RegisterScreen()));
-                    },
-                    child: const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
@@ -137,7 +116,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildTextField(String label, String hint, TextEditingController controller) {
+  Widget _buildTextField(
+      String label, String hint, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

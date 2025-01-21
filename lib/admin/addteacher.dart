@@ -20,6 +20,7 @@ class _AddTeacherScreenState extends State<AddTeacherScreen> {
   final TextEditingController _subjectController = TextEditingController();
 
   final TextEditingController _qualificationsController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +42,8 @@ class _AddTeacherScreenState extends State<AddTeacherScreen> {
               const SizedBox(height: 15),
               _buildTextField(controller: _emailController, label: 'Email'),
               const SizedBox(height: 15),
+              _buildTextField(controller: _passwordController, label: 'Password'),
+              const SizedBox(height: 15),
               _buildTextField(controller: _phoneNumberController, label: 'Phone Number'),
               const SizedBox(height: 15),
               _buildTextField(controller: _subjectController, label: 'Subject'),
@@ -52,6 +55,7 @@ class _AddTeacherScreenState extends State<AddTeacherScreen> {
                  await addTeacher(
                     fullName: _fullNameController.text,
                     email: _emailController.text,
+                    password: _passwordController.text,
                     phoneNumber: _phoneNumberController.text,
                     subject: _subjectController.text,
                     qualifications: _qualificationsController.text,
