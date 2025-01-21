@@ -1,6 +1,7 @@
 import 'package:face_mark/services/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
 
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -13,18 +14,55 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   bool isVisible = false;
 
-  void _login() async {
+  // Error messages
+  String? emailError;
+  String? passwordError;
+
+  // Function to validate inputs
+  bool _validateInputs() {
+    setState(() {
+      emailError = null;
+      passwordError = null;
+    });
+
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
 
-    String? result = await loginUser(context, email, password);
-    if (result == null) {
-      // Login successful, redirection handled by loginUser function
+    // Validate email
+    if (email.isEmpty) {
+      emailError = 'Please enter your email';
+    } else if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        .hasMatch(email)) {
+      emailError = 'Please enter a valid email address';
+    }
+
+    // Validate password
+    if (password.isEmpty) {
+      passwordError = 'Please enter your password';
+    }
+
+    return emailError == null && passwordError == null;
+  }
+
+  void _login() async {
+    if (_validateInputs()) {
+      String email = emailController.text.trim();
+      String password = passwordController.text.trim();
+
+      String? result = await loginUser(context, email, password);
+      if (result == null) {
+        // Login successful, redirection handled by loginUser function
+      } else {
+        // Show error message
+        print(result);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(result)));
+      }
     } else {
-      // Show error message
-      print(result);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(result)));
+      // If validation fails, display error
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fix the errors above.')),
+      );
     }
   }
 
@@ -49,7 +87,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-              _buildTextField('Email', 'Enter your email', emailController),
+              _buildTextField('Email', 'Enter your email', emailController,
+                  error: emailError),
               const SizedBox(height: 20),
               _buildPasswordField(),
               const SizedBox(height: 30),
@@ -112,12 +151,21 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
+        if (passwordError != null)
+          Text(
+            passwordError!,
+            style: const TextStyle(color: Colors.red, fontSize: 12),
+          ),
       ],
     );
   }
 
   Widget _buildTextField(
-      String label, String hint, TextEditingController controller) {
+    String label,
+    String hint,
+    TextEditingController controller, {
+    String? error,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -137,8 +185,14 @@ class _LoginScreenState extends State<LoginScreen> {
             enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.grey),
             ),
+            errorText: error,
           ),
         ),
+        if (error != null)
+          Text(
+            error,
+            style: const TextStyle(color: Colors.red, fontSize: 12),
+          ),
       ],
     );
   }
