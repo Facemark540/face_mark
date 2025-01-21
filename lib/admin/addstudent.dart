@@ -24,7 +24,6 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   String? _emailError;
   String? _rollNumberError;
   String? _yearError;
-  String? _phoneError;
   String? _passwordError;
   String? _fullNameError;
 
@@ -51,7 +50,6 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       _emailError = null;
       _rollNumberError = null;
       _yearError = null;
-      _phoneError = null;
       _passwordError = null;
       _fullNameError = null;
     });

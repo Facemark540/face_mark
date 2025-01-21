@@ -107,9 +107,9 @@ class _AttendanceCalendarState extends State<AttendanceCalendar> {
               focusedDay: _focusedDay,
               firstDay: DateTime(2000),
               lastDay: DateTime(2100),
-              calendarStyle: CalendarStyle(
+              calendarStyle: const CalendarStyle(
                 todayDecoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 19, 53, 126),
+                  color: Color.fromARGB(255, 19, 53, 126),
                   shape: BoxShape.circle,
                 ),
                 outsideDaysVisible: false,
