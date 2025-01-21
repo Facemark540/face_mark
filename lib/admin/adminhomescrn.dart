@@ -26,8 +26,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   Future<void> _fetchCounts() async {
     try {
-      QuerySnapshot studentSnapshot = await FirebaseFirestore.instance.collection('student').get();
-      QuerySnapshot teacherSnapshot = await FirebaseFirestore.instance.collection('teacher').get();
+      QuerySnapshot studentSnapshot =
+          await FirebaseFirestore.instance.collection('student').get();
+      QuerySnapshot teacherSnapshot =
+          await FirebaseFirestore.instance.collection('teacher').get();
 
       setState(() {
         studentCount = studentSnapshot.docs.length;
@@ -67,7 +69,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const AddStudentScreen()));
+                                      builder: (context) =>
+                                          const AddStudentScreen()));
                             },
                           ),
                           const SizedBox(height: 20),
@@ -79,7 +82,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const AddTeacherScreen()));
+                                      builder: (context) =>
+                                          const AddTeacherScreen()));
                             },
                           ),
                           const SizedBox(height: 40),
@@ -95,61 +99,61 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   Widget _buildWelcomeSection() {
-  return Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(20),
-    decoration: const BoxDecoration(
-      gradient: LinearGradient(
-        colors: [
-          Color.fromARGB(255, 19, 53, 126),
-          Color.fromARGB(255, 19, 53, 126)
-        ], // Gradient from dark blue to light blue
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color.fromARGB(255, 19, 53, 126),
+            Color.fromARGB(255, 19, 53, 126)
+          ], // Gradient from dark blue to light blue
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
       ),
-      borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Welcome, Admin!',
-              style: TextStyle(
-                fontFamily: 'Roboto',
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Welcome, Admin!',
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.logout, color: Colors.white),
-              onPressed: () {
-                // Implement logout functionality here
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                );
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        const Text(
-          'Manage your students and teachers efficiently with the tools below.',
-          style: TextStyle(
-            fontFamily: 'Roboto',
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            color: Colors.white70,
+              IconButton(
+                icon: const Icon(Icons.logout, color: Colors.white),
+                onPressed: () {
+                  // Implement logout functionality here
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  );
+                },
+              ),
+            ],
           ),
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(height: 10),
+          const Text(
+            'Manage your students and teachers efficiently with the tools below.',
+            style: TextStyle(
+              fontFamily: 'Roboto',
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: Colors.white70,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildCardButton({
     required String text,
@@ -215,7 +219,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>  StudentDetailsScreen()),
+                      builder: (context) => StudentDetailsScreen()),
                 );
               },
             ),
@@ -292,4 +296,4 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       ),
     );
   }
-} 
+}
