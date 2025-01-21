@@ -167,6 +167,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Student'),
+        foregroundColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 19, 53, 126),
       ),
       body: Padding(

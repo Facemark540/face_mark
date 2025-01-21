@@ -80,10 +80,9 @@ class _AddTeacherScreenState extends State<AddTeacherScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Add Teacher',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: const Color.fromARGB(255, 19, 53, 126), // Dark Blue AppBar
+          'Add Teacher',       ),
+        backgroundColor: const Color.fromARGB(255, 19, 53, 126),
+         foregroundColor: Colors.white, // Set the foreground color to white
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
