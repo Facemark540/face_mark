@@ -20,6 +20,7 @@ class _AddTeacherScreenState extends State<AddTeacherScreen> {
   final TextEditingController _subjectController = TextEditingController();
 
   final TextEditingController _qualificationsController = TextEditingController();
+  
   final TextEditingController _passwordController = TextEditingController();
 
   @override

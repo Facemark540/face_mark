@@ -3,6 +3,7 @@ import 'package:face_mark/admin/addstudent.dart';
 import 'package:face_mark/admin/addteacher.dart';
 import 'package:face_mark/admin/studentdetails.dart';
 import 'package:face_mark/admin/teacherdetails.dart';
+import 'package:face_mark/authscreens/login.dart';
 import 'package:flutter/material.dart';
 
 class AdminHomeScreen extends StatefulWidget {
@@ -94,46 +95,61 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   Widget _buildWelcomeSection() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color.fromARGB(255, 19, 53, 126),
-            Color.fromARGB(255, 19, 53, 126)
-          ], // Gradient from dark blue to light blue
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(20),
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        colors: [
+          Color.fromARGB(255, 19, 53, 126),
+          Color.fromARGB(255, 19, 53, 126)
+        ], // Gradient from dark blue to light blue
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Welcome, Admin!',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white),
+              onPressed: () {
+                // Implement logout functionality here
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+            ),
+          ],
         ),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Welcome, Admin!',
-            style: TextStyle(
-              fontFamily: 'Roboto',
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+        const SizedBox(height: 10),
+        const Text(
+          'Manage your students and teachers efficiently with the tools below.',
+          style: TextStyle(
+            fontFamily: 'Roboto',
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: Colors.white70,
           ),
-          SizedBox(height: 10),
-          Text(
-            'Manage your students and teachers efficiently with the tools below.',
-            style: TextStyle(
-              fontFamily: 'Roboto',
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: Colors.white70,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildCardButton({
     required String text,
@@ -276,4 +292,4 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       ),
     );
   }
-}
+} 

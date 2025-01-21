@@ -11,7 +11,7 @@ class StudentDetailsScreen extends StatefulWidget {
 }
 
 class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
-  bool _isLoading = false;
+ 
 
   @override
   Widget build(BuildContext context) {

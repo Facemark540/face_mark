@@ -1,3 +1,4 @@
+import 'package:face_mark/authscreens/login.dart';
 import 'package:face_mark/teacher/uploadImageScreen.dart';
 import 'package:face_mark/teacher/viewstudent.dart';
 import 'package:flutter/material.dart';
@@ -13,14 +14,28 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 19, 53, 126),
+        foregroundColor: Colors.white, 
+        title: const Text('Teacher Dashboard'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout), // Logout icon
+            onPressed: () {
+              // Navigate to login screen when logout is pressed
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()));
+            },
+          ),
+        ],
+      ),
       backgroundColor: Colors.white, // Set a solid background color (white)
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment:
-                CrossAxisAlignment.center, // Center content horizontally
+            crossAxisAlignment: CrossAxisAlignment.center, // Center content horizontally
             children: [
               // Teacher Dashboard Title
               const Text(

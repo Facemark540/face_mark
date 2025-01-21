@@ -42,9 +42,25 @@ class _StudentHomeScrnState extends State<StudentHomeScrn> {
     }
   }
 
+  void _logout() {
+    // Implement logout functionality here
+    // For example, navigate to the login screen
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 19, 53, 126),
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+          ),
+        ],
+      ),
       body: Container(
         color: Colors.grey.shade100,
         child: Column(
