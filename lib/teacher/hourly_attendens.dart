@@ -66,25 +66,22 @@ class _AttendanceCalendarState extends State<AttendanceCalendar> {
   }
 
   void _showHourlyAttendancePopup(DateTime selectedDay) {
-    String dateKey =
-        "${selectedDay.year}-${selectedDay.month}-${selectedDay.day}";
+    String dateKey = "${selectedDay.year}-${selectedDay.month}-${selectedDay.day}";
     Map<int, bool> hourlyAttendance =
-        _attendance[dateKey] ?? {for (int i = 1; i <= 5; i++) i: false};
+        _attendance[dateKey] ?? Map<int, bool>.fromIterable(List.generate(24, (i) => i), value: (_) => false);
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(
-              "Hourly Attendance - ${selectedDay.toLocal()}".split(' ')[0]),
+          title: Text("Hourly Attendance - ${selectedDay.toLocal()}".split(' ')[0]),
           content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                int hour = index + 1; // Hour ranges from 1 to 5
+              itemCount: 24,
+              itemBuilder: (context, hour) {
                 return CheckboxListTile(
-                  title: Text("Hour $hour"),
+                  title: Text("Hour ${hour}:00"),
                   value: hourlyAttendance[hour],
                   onChanged: (value) {
                     setState(() {

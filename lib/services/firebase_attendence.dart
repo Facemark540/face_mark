@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 Future<void> saveAttendance({
   required String studentId,
   required String studentName,
-  required Map<String, bool> attendance,
+  required dynamic attendance,
   required String month,
   required String year,
 }) async {
