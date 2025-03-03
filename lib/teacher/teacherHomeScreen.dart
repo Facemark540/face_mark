@@ -78,7 +78,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const UploadImageScreen()));
+                              builder: (context) => const HourlyAttendanceScreen()));
                     },
                     child: const Text(
                       'Upload Photo',

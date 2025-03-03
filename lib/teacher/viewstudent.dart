@@ -116,8 +116,9 @@ class _ViewStudentScreenState extends State<ViewStudentScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AttendanceCalendar(
-                                studentId: student.id, // Pass the student ID
+                              builder: (context) => StudentAttendanceScreen(
+      
+                                studentId: student['rollNumber'], // Pass the student ID
                                 studentName: student[
                                     'fullName'], // Pass the student name
                               ),

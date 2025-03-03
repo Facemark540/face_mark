@@ -1,7 +1,11 @@
+
+
+
 import 'dart:io';
 import 'package:face_mark/services/firebase_add_student.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 import 'studentdetails.dart';
 
 class AddStudentScreen extends StatefulWidget {
@@ -19,7 +23,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   final TextEditingController _yearController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  File? _selectedImage;
+  List<File> _selectedImages = [];
 
   String? _emailError;
   String? _rollNumberError;
@@ -27,38 +31,25 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   String? _passwordError;
   String? _fullNameError;
 
-  void _pickImage() async {
+  void _pickImages() async {
     final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    final pickedImages = await picker.pickMultiImage();
 
-    if (pickedImage != null) {
-      setState(() {
-        _selectedImage = File(pickedImage.path);
-      });
+    if (pickedImages.length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select at least 3 images")),
+      );
+      return;
     }
-  }
 
-  void _clearFields() {
-    _fullNameController.clear();
-    _emailController.clear();
-    _rollNumberController.clear();
-    _departmentController.clear();
-    _yearController.clear();
-    _passwordController.clear();
     setState(() {
-      _selectedImage = null;
-      _emailError = null;
-      _rollNumberError = null;
-      _yearError = null;
-      _passwordError = null;
-      _fullNameError = null;
+      _selectedImages = pickedImages.map((e) => File(e.path)).toList();
     });
   }
 
   bool _validateFields() {
     bool isValid = true;
 
-    // Validate Name
     if (_fullNameController.text.trim().isEmpty) {
       setState(() {
         _fullNameError = "Full name is required";
@@ -66,7 +57,6 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       isValid = false;
     }
 
-    // Validate Email
     String email = _emailController.text.trim();
     if (email.isEmpty) {
       setState(() {
@@ -80,33 +70,20 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       isValid = false;
     }
 
-    // Validate Roll Number
     if (_rollNumberController.text.trim().isEmpty) {
       setState(() {
         _rollNumberError = "Roll number is required";
       });
       isValid = false;
-    } else if (int.tryParse(_rollNumberController.text.trim()) == null) {
-      setState(() {
-        _rollNumberError = "Roll number must be a number";
-      });
-      isValid = false;
     }
 
-    // Validate Year
     if (_yearController.text.trim().isEmpty) {
       setState(() {
         _yearError = "Year is required";
       });
       isValid = false;
-    } else if (int.tryParse(_yearController.text.trim()) == null) {
-      setState(() {
-        _yearError = "Year must be a number";
-      });
-      isValid = false;
     }
 
-    // Validate Password
     if (_passwordController.text.trim().isEmpty) {
       setState(() {
         _passwordError = "Password is required";
@@ -114,10 +91,9 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       isValid = false;
     }
 
-    // Validate Image
-    if (_selectedImage == null) {
+    if (_selectedImages.length < 3) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please pick a student image")),
+        const SnackBar(content: Text("Please select at least 3 images")),
       );
       isValid = false;
     }
@@ -125,39 +101,56 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     return isValid;
   }
 
-  Future<void> _handleSubmit() async {
-    if (_validateFields()) {
-      try {
-        await addStudentToFirebase(
+  Future<void> _uploadImages() async {
+    if (!_validateFields()) return;
+
+    var request = http.MultipartRequest('POST', Uri.parse('https://7ed1-2409-4073-201-eec-2b85-aa7c-fdd4-f98.ngrok-free.app/upload'));
+    request.fields['rollno'] = _rollNumberController.text;
+
+    for (var image in _selectedImages) {
+      request.files.add(await http.MultipartFile.fromPath('files', image.path));
+    }
+
+    var response = await request.send();
+    if (response.statusCode == 200) {
+
+       
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Images uploaded successfully")),
+      );
+      await addStudentToFirebase(
           fullName: _fullNameController.text,
           email: _emailController.text,
           rollNumber: _rollNumberController.text,
           department: _departmentController.text,
           year: _yearController.text,
           password: _passwordController.text,
-          imageFile: _selectedImage,
+          imageFile: null,
         );
+      _clearFields();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Student Added Successfully")),
-        );
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => StudentDetailsScreen()),
-        );
-
-        _clearFields();
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e")),
-        );
-      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fix the errors above.")),
+        const SnackBar(content: Text("Image upload failed")),
       );
     }
+  }
+
+  void _clearFields() {
+    _fullNameController.clear();
+    _emailController.clear();
+    _rollNumberController.clear();
+    _departmentController.clear();
+    _yearController.clear();
+    _passwordController.clear();
+    setState(() {
+      _selectedImages.clear();
+      _emailError = null;
+      _rollNumberError = null;
+      _yearError = null;
+      _passwordError = null;
+      _fullNameError = null;
+    });
   }
 
   @override
@@ -187,7 +180,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
             _buildTextField(controller: _passwordController, label: 'Password', obscureText: true, errorText: _passwordError),
             const SizedBox(height: 25),
             ElevatedButton(
-              onPressed: _handleSubmit,
+              onPressed: _uploadImages,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 255, 111, 0),
                 padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
@@ -207,19 +200,18 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   Widget _buildImagePicker() {
     return Column(
       children: [
-        if (_selectedImage != null)
-          Image.file(
-            _selectedImage!,
-            height: 150,
-            width: 150,
-            fit: BoxFit.cover,
+        if (_selectedImages.isNotEmpty)
+          Wrap(
+            spacing: 10,
+            children: _selectedImages.map((file) => Image.file(file, height: 100, width: 100, fit: BoxFit.cover)).toList(),
           )
         else
           const Icon(Icons.person, size: 100, color: Colors.grey),
-        TextButton(onPressed: _pickImage, child: const Text('Pick an Image')),
+        TextButton(onPressed: _pickImages, child: const Text('Pick at least 3 Images')),
       ],
     );
   }
+
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -240,3 +232,26 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

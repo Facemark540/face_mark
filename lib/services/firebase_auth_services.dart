@@ -1,6 +1,6 @@
 import 'package:face_mark/admin/adminhomescrn.dart';
 import 'package:face_mark/student/studenthomescrn.dart';
-import 'package:face_mark/teacher/teacherhomescreen.dart';
+import 'package:face_mark/teacher/teacherHomeScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
