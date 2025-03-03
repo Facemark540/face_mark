@@ -1,12 +1,8 @@
-
-
-
 import 'dart:io';
 import 'package:face_mark/services/firebase_add_student.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'studentdetails.dart';
 
 class AddStudentScreen extends StatefulWidget {
   const AddStudentScreen({super.key});
@@ -24,6 +20,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   List<File> _selectedImages = [];
+  bool _isLoading = false; // Loading state variable
 
   String? _emailError;
   String? _rollNumberError;
@@ -63,7 +60,8 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
         _emailError = "Email is required";
       });
       isValid = false;
-    } else if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(email)) {
+    } else if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        .hasMatch(email)) {
       setState(() {
         _emailError = "Please enter a valid email address";
       });
@@ -104,21 +102,28 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   Future<void> _uploadImages() async {
     if (!_validateFields()) return;
 
-    var request = http.MultipartRequest('POST', Uri.parse('https://7ed1-2409-4073-201-eec-2b85-aa7c-fdd4-f98.ngrok-free.app/upload'));
-    request.fields['rollno'] = _rollNumberController.text;
+    setState(() {
+      _isLoading = true; // Start loading
+    });
 
-    for (var image in _selectedImages) {
-      request.files.add(await http.MultipartFile.fromPath('files', image.path));
-    }
-
-    var response = await request.send();
-    if (response.statusCode == 200) {
-
-       
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Images uploaded successfully")),
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://6bc3-117-213-7-172.ngrok-free.app/upload'),
       );
-      await addStudentToFirebase(
+      request.fields['rollno'] = _rollNumberController.text;
+
+      for (var image in _selectedImages) {
+        request.files
+            .add(await http.MultipartFile.fromPath('files', image.path));
+      }
+
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Images uploaded successfully")),
+        );
+        await addStudentToFirebase(
           fullName: _fullNameController.text,
           email: _emailController.text,
           rollNumber: _rollNumberController.text,
@@ -127,12 +132,20 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
           password: _passwordController.text,
           imageFile: null,
         );
-      _clearFields();
-
-    } else {
+        _clearFields();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Image upload failed")),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Image upload failed")),
+        SnackBar(content: Text("Error: ${e.toString()}")),
       );
+    } finally {
+      setState(() {
+        _isLoading = false; // Stop loading
+      });
     }
   }
 
@@ -161,39 +174,69 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
         foregroundColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 19, 53, 126),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: ListView(
-          children: [
-            _buildImagePicker(),
-            const SizedBox(height: 15),
-            _buildTextField(controller: _fullNameController, label: 'Student Name', errorText: _fullNameError),
-            const SizedBox(height: 15),
-            _buildTextField(controller: _rollNumberController, label: 'Roll Number', keyboardType: TextInputType.number, errorText: _rollNumberError),
-            const SizedBox(height: 15),
-            _buildTextField(controller: _departmentController, label: 'Department'),
-            const SizedBox(height: 15),
-            _buildTextField(controller: _yearController, label: 'Year', keyboardType: TextInputType.number, errorText: _yearError),
-            const SizedBox(height: 15),
-            _buildTextField(controller: _emailController, label: 'Email Address', keyboardType: TextInputType.emailAddress, errorText: _emailError),
-            const SizedBox(height: 15),
-            _buildTextField(controller: _passwordController, label: 'Password', obscureText: true, errorText: _passwordError),
-            const SizedBox(height: 25),
-            ElevatedButton(
-              onPressed: _uploadImages,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 255, 111, 0),
-                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 80),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-              ),
-              child: const Text(
-                'Submit',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator()) // Loading indicator
+          : Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: ListView(
+                children: [
+                  _buildImagePicker(),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                      controller: _fullNameController,
+                      label: 'Student Name',
+                      errorText: _fullNameError),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                      controller: _rollNumberController,
+                      label: 'Roll Number',
+                      keyboardType: TextInputType.number,
+                      errorText: _rollNumberError),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                      controller: _departmentController, label: 'Department'),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                      controller: _yearController,
+                      label: 'Year',
+                      keyboardType: TextInputType.number,
+                      errorText: _yearError),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                      controller: _emailController,
+                      label: 'Email Address',
+                      keyboardType: TextInputType.emailAddress,
+                      errorText: _emailError),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                      controller: _passwordController,
+                      label: 'Password',
+                      obscureText: true,
+                      errorText: _passwordError),
+                  const SizedBox(height: 25),
+                  ElevatedButton(
+                    onPressed: _isLoading
+                        ? null
+                        : _uploadImages, // Disable button when loading
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 255, 111, 0),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 80),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
+                    ),
+                    child: const Text(
+                      'Submit',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -203,15 +246,19 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
         if (_selectedImages.isNotEmpty)
           Wrap(
             spacing: 10,
-            children: _selectedImages.map((file) => Image.file(file, height: 100, width: 100, fit: BoxFit.cover)).toList(),
+            children: _selectedImages
+                .map((file) => Image.file(file,
+                    height: 100, width: 100, fit: BoxFit.cover))
+                .toList(),
           )
         else
           const Icon(Icons.person, size: 100, color: Colors.grey),
-        TextButton(onPressed: _pickImages, child: const Text('Pick at least 3 Images')),
+        TextButton(
+            onPressed: _pickImages,
+            child: const Text('Pick at least 3 Images')),
       ],
     );
   }
-
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -232,26 +279,3 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

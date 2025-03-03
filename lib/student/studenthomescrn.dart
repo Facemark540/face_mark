@@ -1,18 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:face_mark/authscreens/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:face_mark/student/attendanceScreen.dart';
 
 class StudentHomeScrn extends StatefulWidget {
   final String studentName;
   final String studentEmail;
+  final String rollnum;
   final String studentId; // Added studentId for fetching image
 
-  const StudentHomeScrn({
-    super.key,
-    required this.studentName,
-    required this.studentEmail,
-    required this.studentId,
-  });
+  const StudentHomeScrn(
+      {super.key,
+      required this.studentName,
+      required this.studentEmail,
+      required this.studentId,
+      required this.rollnum});
 
   @override
   State<StudentHomeScrn> createState() => _StudentHomeScrnState();
@@ -42,10 +45,18 @@ class _StudentHomeScrnState extends State<StudentHomeScrn> {
     }
   }
 
-  void _logout() {
+  void _logout() async {
+    await FirebaseAuth.instance.signOut();
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginScreen(),
+      ),
+      (route) => false,
+    );
     // Implement logout functionality here
     // For example, navigate to the login screen
-    Navigator.pushReplacementNamed(context, '/login');
   }
 
   @override
@@ -114,8 +125,8 @@ class _StudentHomeScrnState extends State<StudentHomeScrn> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => StudentAttendanceCalendar(
-                              studentId: widget.studentId,
+                            builder: (context) => StudentViewAttendanceScreen(
+                              studentId: widget.rollnum,
                               studentName: widget.studentName,
                             ),
                           ),

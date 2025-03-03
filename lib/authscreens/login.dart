@@ -1,7 +1,6 @@
 import 'package:face_mark/services/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -55,8 +54,8 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         // Show error message
         print(result);
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(result)));
+        //   ScaffoldMessenger.of(context)
+        //       .showSnackBar(SnackBar(content: Text(result)));
       }
     } else {
       // If validation fails, display error

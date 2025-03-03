@@ -15,11 +15,14 @@ class HourlyAttendanceScreen extends StatefulWidget {
 }
 
 class _HourlyAttendanceScreenState extends State<HourlyAttendanceScreen> {
-  // Track attendance status for each hour
-  final List<bool> _attendance = [false, false, false, false, false];
+  // Track attendance status for the selected hour
+  bool _attendance = false;
 
-  // Track images for each hour
-  final List<File?> _hourlyImages = [null, null, null, null, null];
+  // Track image for the selected hour
+  File? _selectedImage;
+
+  // Selected hour from dropdown
+  int? _selectedHour;
 
   // Image picker instance
   final ImagePicker _picker = ImagePicker();
@@ -30,25 +33,24 @@ class _HourlyAttendanceScreenState extends State<HourlyAttendanceScreen> {
   // Firebase Auth instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  XFile? image;
-
   // Function to handle image selection (camera or gallery)
-  Future<void> _selectImage(int hourIndex, ImageSource source) async {
-    image = await _picker.pickImage(source: source);
+  Future<void> _selectImage(ImageSource source) async {
+    final image = await _picker.pickImage(source: source);
     if (image != null) {
       setState(() {
-        _hourlyImages[hourIndex] = File(image!.path);
+        _selectedImage = File(image.path);
       });
 
       // Upload the image to the API and mark attendance
-      await _uploadImageToAPI(File(image!.path), hourIndex);
+      if (_selectedHour != null) {
+        await _uploadImageToAPI(_selectedImage!, _selectedHour! - 1);
+      }
     }
   }
 
   // Function to upload image to the API and mark attendance
   Future<void> _uploadImageToAPI(File imageFile, int hourIndex) async {
-    const String apiUrl =
-        'https://7ed1-2409-4073-201-eec-2b85-aa7c-fdd4-f98.ngrok-free.app/recognize';
+    const String apiUrl = 'https://6bc3-117-213-7-172.ngrok-free.app/recognize';
 
     try {
       // Create a multipart request
@@ -59,7 +61,8 @@ class _HourlyAttendanceScreenState extends State<HourlyAttendanceScreen> {
         await http.MultipartFile.fromPath(
           'file', // Field name for the file
           imageFile.path,
-          contentType: MediaType('image', 'jpeg'), // Adjust content type if needed
+          contentType:
+              MediaType('image', 'jpeg'), // Adjust content type if needed
         ),
       );
 
@@ -113,14 +116,11 @@ class _HourlyAttendanceScreenState extends State<HourlyAttendanceScreen> {
   Future<void> _markAttendance(String rollno, int hourIndex) async {
     try {
       // Get the current user (teacher)
-      User? user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('User not logged in');
-      }
 
       // Get the current date
       DateTime now = DateTime.now();
-      String dateKey = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+      String dateKey =
+          "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
       print(rollno);
 
       // Reference to the student document
@@ -139,7 +139,7 @@ class _HourlyAttendanceScreenState extends State<HourlyAttendanceScreen> {
         'hour': hourIndex + 1,
         'rollno': rollno,
         'present': true,
-        'teacher_uid': user.uid,
+        'teacher_uid': FirebaseAuth.instance.currentUser?.uid,
         'timestamp': FieldValue.serverTimestamp(),
       });
 
@@ -174,20 +174,35 @@ class _HourlyAttendanceScreenState extends State<HourlyAttendanceScreen> {
       body: Container(
         color: Colors.grey.shade100,
         padding: const EdgeInsets.all(16),
-        child: ListView.builder(
-          itemCount: 5,
-          itemBuilder: (context, index) {
-            return _buildHourlyAttendanceCard(index + 1);
-          },
+        child: Column(
+          children: [
+            // Dropdown for hour selection
+            DropdownButton<int>(
+              value: _selectedHour,
+              hint: const Text('Select Hour'),
+              items: List.generate(5, (index) => index + 1)
+                  .map((hour) => DropdownMenuItem(
+                        value: hour,
+                        child: Text('Hour $hour'),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedHour = value;
+                  _attendance = false; // Reset attendance status
+                  _selectedImage = null; // Reset selected image
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            if (_selectedHour != null) _buildAttendanceCard(),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Save attendance for all hours
-          for (int i = 0; i < 5; i++) {
-            if (_hourlyImages[i] != null) {
-              await _uploadImageToAPI(_hourlyImages[i]!, i);
-            }
+          if (_selectedHour != null && _selectedImage != null) {
+            await _uploadImageToAPI(_selectedImage!, _selectedHour! - 1);
           }
         },
         backgroundColor: Colors.blue.shade800,
@@ -196,9 +211,8 @@ class _HourlyAttendanceScreenState extends State<HourlyAttendanceScreen> {
     );
   }
 
-  // Build a card for each hour
-  Widget _buildHourlyAttendanceCard(int hour) {
-    int index = hour - 1; // Convert hour to list index
+  // Build the attendance card for the selected hour
+  Widget _buildAttendanceCard() {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -213,17 +227,17 @@ class _HourlyAttendanceScreenState extends State<HourlyAttendanceScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Hour $hour',
+                  'Hour $_selectedHour',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Checkbox(
-                  value: _attendance[index],
+                  value: _attendance,
                   onChanged: (value) {
                     setState(() {
-                      _attendance[index] = value ?? false;
+                      _attendance = value ?? false;
                     });
                   },
                   activeColor: Colors.blue.shade800,
@@ -231,11 +245,11 @@ class _HourlyAttendanceScreenState extends State<HourlyAttendanceScreen> {
               ],
             ),
             const SizedBox(height: 10),
-            _hourlyImages[index] != null
+            _selectedImage != null
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.file(
-                      _hourlyImages[index]!,
+                      _selectedImage!,
                       height: 100,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -259,26 +273,28 @@ class _HourlyAttendanceScreenState extends State<HourlyAttendanceScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton.icon(
-                  onPressed: () => _selectImage(index, ImageSource.camera),
+                  onPressed: () => _selectImage(ImageSource.camera),
                   icon: const Icon(Icons.camera_alt),
                   label: const Text('Camera'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade800,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () => _selectImage(index, ImageSource.gallery),
+                  onPressed: () => _selectImage(ImageSource.gallery),
                   icon: const Icon(Icons.photo_library),
                   label: const Text('Gallery'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade800,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -291,10 +307,4 @@ class _HourlyAttendanceScreenState extends State<HourlyAttendanceScreen> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    home: HourlyAttendanceScreen(),
-  ));
 }
