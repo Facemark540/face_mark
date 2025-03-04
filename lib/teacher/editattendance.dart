@@ -73,56 +73,63 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
   }
 
   // Show dialog to edit attendance for a specific date
-  void _showEditAttendancePopup(DateTime selectedDay) {
-    String dateKey =
-        "${selectedDay.year}-${selectedDay.month.toString().padLeft(2, '0')}-${selectedDay.day.toString().padLeft(2, '0')}";
-    
-    // Initialize hourlyAttendance with existing data or default values
-    Map<int, bool> hourlyAttendance = _attendance[dateKey] ?? {for (int i = 1; i <= 5; i++) i: false};
+ void _showEditAttendancePopup(DateTime selectedDay) {
+  String dateKey =
+      "${selectedDay.year}-${selectedDay.month.toString().padLeft(2, '0')}-${selectedDay.day.toString().padLeft(2, '0')}";
+  
+  // Initialize hourlyAttendance with existing data or default values
+  Map<int, bool> hourlyAttendance = _attendance[dateKey] ?? {};
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Edit Attendance - ${selectedDay.toLocal()}".split(' ')[0]),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                int hour = index + 1; // Hour ranges from 1 to 5
-                return CheckboxListTile(
-                  title: Text("Hour $hour"),
-                  value: hourlyAttendance[hour],
-                  onChanged: (value) {
-                    setState(() {
-                      hourlyAttendance[hour] = value ?? false;
-                    });
-                  },
-                );
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                await _updateAttendance(dateKey, hourlyAttendance);
-                setState(() {
-                  _attendance[dateKey] = hourlyAttendance; // Update local state
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text("Save"),
-            ),
-          ],
-        );
-      },
-    );
+  // Ensure all hours (1 to 5) are included in the map
+  for (int i = 1; i <= 5; i++) {
+    if (!hourlyAttendance.containsKey(i)) {
+      hourlyAttendance[i] = false; // Default to false if the hour is not present
+    }
   }
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("Edit Attendance - ${selectedDay.toLocal()}".split(' ')[0]),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              int hour = index + 1; // Hour ranges from 1 to 5
+              return CheckboxListTile(
+                title: Text("Hour $hour"),
+                value: hourlyAttendance[hour],
+                onChanged: (value) {
+                  setState(() {
+                    hourlyAttendance[hour] = value ?? false;
+                  });
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await _updateAttendance(dateKey, hourlyAttendance);
+              setState(() {
+                _attendance[dateKey] = hourlyAttendance; // Update local state
+              });
+              Navigator.of(context).pop();
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   // Update attendance data in Firestore
   Future<void> _updateAttendance(String dateKey, Map<int, bool> hourlyAttendance) async {
